@@ -92,7 +92,7 @@ const updateCardNames = (arr) => {
 
 // floors / pathing
 const runPathing = (data) => {
-	const {campfire_choices, damage_taken, path_per_floor, path_taken, card_choices, event_choices, boss_relics, potions_obtained, gold_per_floor} = data
+	const {campfire_choices, damage_taken, path_per_floor, path_taken, card_choices, event_choices, boss_relics, potions_obtained, gold_per_floor, items_purchased, item_purchase_floors, items_purged_floors, items_purged} = data
 	// array of objects
 	// objects will be what happens on each floor
 	// use path_taken as base
@@ -178,7 +178,27 @@ const runPathing = (data) => {
 				restAction: restData.key,
 				restSmithedCard: restData.key === "SMITH" ? restData.data : null
 			}
-			// console.log(`RestData: ${JSON.stringify(restData)}`);
+		}
+
+		// items_purged - removed cards from deck - from shop, events?
+		// purchased_purges - lists how many card removes were purchased
+		// items_purged_floors - lists shop floors 
+		// purchased_purges === items_purged_floors.length === items_purged.length
+		// these data sets do not include other methods of card removal ie. peace pipe, events
+		if (val.orig_type === "$") {
+			// combine purchase + floor, and return filtered array for a given floor
+			const shopPurchases = item_purchase_floors.map((shopFloor, index) => ({floor: shopFloor, purchase: items_purchased[index]}))
+			const purchasesPerFloor = shopPurchases.filter(sp => sp.floor === val.floor)
+
+			// combine removal + floor, and find the removal
+			const shopRemovals = items_purged_floors.map((shopFloor, index) => ({floor: shopFloor, removal: items_purged[index]}))
+			const removal = shopRemovals.find(rm => rm.floor === val.floor)
+
+			return {
+				...val,
+				purchases: purchasesPerFloor.map(item => item.purchase),
+				cardRemoval: removal ? removal.removal : null
+			}
 		}
 		return val // add generic stuff like gold, HP here? so it would get added onto all data objs
 	})
