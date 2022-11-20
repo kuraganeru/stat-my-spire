@@ -92,7 +92,7 @@ const updateCardNames = (arr) => {
 
 // floors / pathing
 const runPathing = (data) => {
-	const {campfire_choices, damage_taken, path_per_floor, path_taken, card_choices, event_choices, boss_relics, potions_obtained} = data
+	const {campfire_choices, damage_taken, path_per_floor, path_taken, card_choices, event_choices, boss_relics, potions_obtained, gold_per_floor} = data
 	// array of objects
 	// objects will be what happens on each floor
 	// use path_taken as base
@@ -129,7 +129,7 @@ const runPathing = (data) => {
 			{orig_name: "$", new_name: "Shop"},
 			{orig_name: "E", new_name: "Elite"},
 			{orig_name: "B", new_name: "Boss"},
-			{orig_name: "R", new_name: "Campsite"},
+			{orig_name: "R", new_name: "Rest Site"},
 			{orig_name: "T", new_name: "Treasure"},
 			{orig_name: "AB", new_name: "After Boss"}]
 		const formattedType = floorTypes.find(obj => obj.orig_name === val)
@@ -152,7 +152,7 @@ const runPathing = (data) => {
 	// check for neow bonus - if exists, neow_bonus_log
 
 	const checkMonsters = floorData.map((val, index) => {
-		if (val.orig_type === "M") {
+		if (val.orig_type === "M" || val.orig_type === "E") {
 			const fightData = damage_taken.find(m => m.floor === val.floor)
 			const cardData = card_choices.find(c => c.floor === val.floor)
 			const potionObtainedData = potions_obtained.find(po => po.floor === val.floor)
@@ -162,19 +162,30 @@ const runPathing = (data) => {
 				enemies: fightData.enemies,
 				damageTaken: fightData.damage,
 				turns: fightData.turns,
-				cardRewardPicked: cardData.picked,
-				cardsSkipped: cardData.not_picked,
+				cardRewardPicked: cardData.picked, // edge case for act 3 / heart
+				cardsSkipped: cardData.not_picked, // neither of the above drop cards
 				potionFound: {
 					didFindPotion: potionObtainedData ? true : false,
 					potionFound: potionObtainedData ? potionObtainedData.key : null
 				}
 			}
 		}
-		return val
+
+		if (val.orig_type === "R") {
+			const restData = campfire_choices.find(camp => camp.floor === val.floor)
+			return {
+				...val,
+				restAction: restData.key,
+				restSmithedCard: restData.key === "SMITH" ? restData.data : null
+			}
+			// console.log(`RestData: ${JSON.stringify(restData)}`);
+		}
+		return val // add generic stuff like gold, HP here? so it would get added onto all data objs
 	})
 
-	
-	console.log(checkMonsters)
+
+
+	return checkMonsters
 }
 
 // routes
@@ -183,8 +194,8 @@ app.post("/upload", async (req, res) => {
 	const dataJSON = JSON.parse(data)
 	const formattedDeck = masterDeck(dataJSON.master_deck)
 	const updatedCards = updateCardNames(formattedDeck)
-	runPathing(dataJSON)
-	res.json(updatedCards)
+	const runPath = runPathing(dataJSON)
+	res.json(runPath)
 })
 
 // works - putting aside for now to use hardcoded
