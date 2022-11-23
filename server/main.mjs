@@ -92,7 +92,7 @@ const updateCardNames = (arr) => {
 
 // floors / pathing
 const runPathing = (data) => {
-	const {campfire_choices, damage_taken, path_per_floor, path_taken, card_choices, event_choices, boss_relics, potions_obtained, gold_per_floor, items_purchased, item_purchase_floors, items_purged_floors, items_purged} = data
+	const {campfire_choices, damage_taken, path_per_floor, path_taken, card_choices, event_choices, boss_relics, potions_obtained, gold_per_floor, items_purchased, item_purchase_floors, items_purged_floors, items_purged, relics_obtained} = data
 	// array of objects
 	// objects will be what happens on each floor
 	// use path_taken as base
@@ -156,7 +156,6 @@ const runPathing = (data) => {
 			const fightData = damage_taken.find(m => m.floor === val.floor)
 			const cardData = card_choices.find(c => c.floor === val.floor)
 			const potionObtainedData = potions_obtained.find(po => po.floor === val.floor)
-
 			return {
 				...val,
 				enemies: fightData.enemies,
@@ -200,11 +199,32 @@ const runPathing = (data) => {
 				cardRemoval: removal ? removal.removal : null
 			}
 		}
+		
+		// relics:
+		// relics_obtained = relics from elites, chests, events - means we need to check this in the above as well
+		// boss_relics = self explan
+		// relics - whole list of relics (shops, et al)
+		// relic_states - would probably need to handcode all the values - maybe? lol
+
+		if (val.orig_type === "T") {
+			console.log(val)
+			const treasureData = relics_obtained.find(treasureFloor => treasureFloor.floor === val.floor)
+			console.log()
+			return {
+				...val,
+				foundRelic: treasureData ? treasureData.key : "Skipped Relic (For blue key)"
+			}
+		}
+
+		// question marks:
+		/* question marks can be:
+			-event -> event_choices
+			-monster / combat -> damage_taken, card_choices, potions_obtained
+			-treasure -> relilcs_obtained
+			-shop -> item_purchase_floors, items_purchased
+		*/
 		return val // add generic stuff like gold, HP here? so it would get added onto all data objs
 	})
-
-
-
 	return checkMonsters
 }
 
