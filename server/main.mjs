@@ -2,6 +2,7 @@ import express from 'express'
 import multer from 'multer'
 import cors from "cors"
 import * as fs from 'fs'
+import path from 'path'
 
 // just testing branching...for use when switching PCs
 
@@ -120,27 +121,76 @@ const runPathing = (data) => {
 		card_choices - display picked, not_picked
 	*/
 
-	const floorData = path_per_floor.map(val => val || "AB").map((val, index) => { 
-		// path_per_floor closer matches the actual game, as the max floor is 55/56
-		// boss relic / null value DOES count as a floor - don't remove null value from path_taken
+	const formattedPathPerFloor = path_per_floor.map(val => {
+		if (val === null) {
+			return "AB"
+		}
+		if (val === "B") {
+			return "BOSS"
+		}
+		return val
+	})
+
+	const formatPathTakenFn = (arr) => {
+		let path = [...arr]
+		for (let i = path.length - 1; i >= 0; i--) {
+			if (path[i] === "BOSS" && path[i+1] != "BOSS") {
+				path.splice(i + 1, 0, "AB")
+			}
+		}
+		return path;
+	}
+	const formattedPathTaken = formatPathTakenFn(path_taken)
+	
+	const checkPathFloorTakenAreEqual = (formattedPathPerFloor.length === formattedPathTaken.length) && formattedPathPerFloor.every(val => formattedPathTaken.includes(val))
+
+	// switch to path_taken so we can represent ? properly.
+		// QEV - question mark -> event
+		// QM -> question mark -> monster
+		// QS -> question mark -> shop
+		// QT -> question mark -> treasure
+
+	const floorData = formattedPathTaken.map((val, index) => { 
+		// console.log(`taken: ${val}, floor: ${formattedPathPerFloor[index]}`)
 		const floorTypes = [
 			{orig_name: "M", new_name: "Monster"}, 
 			{orig_name: "?", new_name: "Question Mark"}, 
 			{orig_name: "$", new_name: "Shop"},
 			{orig_name: "E", new_name: "Elite"},
-			{orig_name: "B", new_name: "Boss"},
+			{orig_name: "BOSS", new_name: "Boss"},
 			{orig_name: "R", new_name: "Rest Site"},
 			{orig_name: "T", new_name: "Treasure"},
-			{orig_name: "AB", new_name: "After Boss"}]
-		const formattedType = floorTypes.find(obj => obj.orig_name === val)
-		const replaceEvent = formattedType.orig_name === "?" ? path_per_floor[index] : null
-		return {
-			orig_type: formattedType.orig_name,
-			type: formattedType.new_name,
-			floor: index + 1,
-			event: {
-				isEvent: replaceEvent === "?" ? true : false
+			{orig_name: "AB", new_name: "After Boss"},
+			{orig_name: "QEV", new_name: "Event"},
+			{orig_name: "QM", new_name: "Unknown / Monster"},
+			{orig_name: "QS", new_name: "Unknown / Shop"},
+			{orig_name: "QT", new_name: "Unknown / Treasure"}]
+
+		// compare taken vs floor
+		const compareTakenFloorPaths = (taken, floor) => {
+			if (taken === "?" && floor === "?") {
+				return "QEV"
 			}
+			if (taken === "?" && floor === "M") {
+				return "QM"
+			} 
+			if (taken === "?" && floor === "$") {
+				return "QS"
+			} 
+			if (taken === "?" && floor === "T") {
+				return "QT"
+			}
+			return val 
+		}
+		const comparePathsResult = compareTakenFloorPaths(val, formattedPathPerFloor[index])
+		console.log(compareTakenFloorPaths(val, formattedPathPerFloor[index]))
+
+		const formattedType = floorTypes.find(obj => obj.orig_name === comparePathsResult)
+		// problem here with events - orig_type gets set to "M" instead of "?"
+		return {
+			orig_type: formattedType.orig_name, 
+			type: formattedType.new_name,
+			floor: index + 1
 		}
 	})
 
@@ -152,7 +202,7 @@ const runPathing = (data) => {
 	// check for neow bonus - if exists, neow_bonus_log
 
 	const checkMonsters = floorData.map((val, index) => {
-		if (val.orig_type === "M" || val.orig_type === "E") {
+		if (val.orig_type === "M" || val.orig_type === "E" || val.orig_type === "QM" || val.orig_type === "BOSS") {
 			const fightData = damage_taken.find(m => m.floor === val.floor)
 			const cardData = card_choices.find(c => c.floor === val.floor)
 			const potionObtainedData = potions_obtained.find(po => po.floor === val.floor)
@@ -161,8 +211,8 @@ const runPathing = (data) => {
 				enemies: fightData.enemies,
 				damageTaken: fightData.damage,
 				turns: fightData.turns,
-				cardRewardPicked: cardData.picked, // edge case for act 3 / heart
-				cardsSkipped: cardData.not_picked, // neither of the above drop cards
+				cardRewardPicked: cardData ? cardData.picked : null, // edge case for act 3 / heart
+				cardsSkipped: cardData ? cardData.not_picked : null, // neither of the above drop cards
 				potionFound: {
 					didFindPotion: potionObtainedData ? true : false,
 					potionFound: potionObtainedData ? potionObtainedData.key : null
@@ -175,7 +225,7 @@ const runPathing = (data) => {
 			return {
 				...val,
 				restAction: restData.key,
-				restSmithedCard: restData.key === "SMITH" ? restData.data : null
+				upgradedCard: restData.key === "SMITH" ? restData.data : null
 			}
 		}
 
@@ -184,7 +234,7 @@ const runPathing = (data) => {
 		// items_purged_floors - lists shop floors 
 		// purchased_purges === items_purged_floors.length === items_purged.length
 		// these data sets do not include other methods of card removal ie. peace pipe, events
-		if (val.orig_type === "$") {
+		if (val.orig_type === "$" || val.orig_type === "QS") {
 			// combine purchase + floor, and return filtered array for a given floor
 			const shopPurchases = item_purchase_floors.map((shopFloor, index) => ({floor: shopFloor, purchase: items_purchased[index]}))
 			const purchasesPerFloor = shopPurchases.filter(sp => sp.floor === val.floor)
@@ -206,10 +256,9 @@ const runPathing = (data) => {
 		// relics - whole list of relics (shops, et al)
 		// relic_states - would probably need to handcode all the values - maybe? lol
 
-		if (val.orig_type === "T") {
-			console.log(val)
+		if (val.orig_type === "T" || val.orig_type === "QT") {
+			// console.log(val)
 			const treasureData = relics_obtained.find(treasureFloor => treasureFloor.floor === val.floor)
-			console.log()
 			return {
 				...val,
 				foundRelic: treasureData ? treasureData.key : "Skipped Relic (For blue key)"
@@ -223,6 +272,16 @@ const runPathing = (data) => {
 			-treasure -> relilcs_obtained
 			-shop -> item_purchase_floors, items_purchased
 		*/
+
+		if (val.orig_type === "QEV") {
+			const eventData = event_choices.find(eventFloor => eventFloor.floor === val.floor)
+			return {
+				...val,
+				...eventData
+
+			}
+		}
+
 		return val // add generic stuff like gold, HP here? so it would get added onto all data objs
 	})
 	return checkMonsters
@@ -230,7 +289,7 @@ const runPathing = (data) => {
 
 // routes
 app.post("/upload", async (req, res) => {
-	const data = fs.readFileSync('uploads/clad.json')
+	const data = fs.readFileSync('uploads/clada20.json')
 	const dataJSON = JSON.parse(data)
 	const formattedDeck = masterDeck(dataJSON.master_deck)
 	const updatedCards = updateCardNames(formattedDeck)
