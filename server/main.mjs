@@ -93,7 +93,7 @@ const updateCardNames = (arr) => {
 
 // floors / pathing
 const runPathing = (data) => {
-	const {campfire_choices, damage_taken, path_per_floor, path_taken, card_choices, event_choices, boss_relics, potions_obtained, gold_per_floor, items_purchased, item_purchase_floors, items_purged_floors, items_purged, relics_obtained} = data
+	const {campfire_choices, damage_taken, path_per_floor, path_taken, card_choices, event_choices, boss_relics, potions_obtained, gold_per_floor, items_purchased, item_purchase_floors, items_purged_floors, items_purged, relics_obtained, relic_stats} = data
 	// array of objects
 	// objects will be what happens on each floor
 	// use path_taken as base
@@ -206,6 +206,8 @@ const runPathing = (data) => {
 			const fightData = damage_taken.find(m => m.floor === val.floor)
 			const cardData = card_choices.find(c => c.floor === val.floor)
 			const potionObtainedData = potions_obtained.find(po => po.floor === val.floor)
+			const relicData = val.orig_type === "E" ? relics_obtained.find(re => re.floor === val.floor) : null
+			// console.log(relicData)
 			return {
 				...val,
 				enemies: fightData.enemies,
@@ -216,7 +218,8 @@ const runPathing = (data) => {
 				potionFound: {
 					didFindPotion: potionObtainedData ? true : false,
 					potionFound: potionObtainedData ? potionObtainedData.key : null
-				}
+				},
+				relic_found: relicData ? relicData.key : null 
 			}
 		}
 
@@ -279,6 +282,22 @@ const runPathing = (data) => {
 				...val,
 				...eventData
 
+			}
+		}
+
+		// 17/34 are the only floors where a boss relic can be obtained
+		// other AB / "after boss" rooms are non-gameplay related scenes where no choice is made
+		if (val.orig_type === "AB" && val.floor === 17 || val.floor === 34) {
+			// all relic data
+			const obtainStats = Object.entries(relic_stats.obtain_stats[0]).map(([key, value]) => ({relic: key, floor: value}));
+			
+			// boss relic data
+			const bossRelicFloorData = obtainStats.find(rel => rel.floor === val.floor)
+			const bossRelicPickedData = boss_relics.find(rel => rel.picked === bossRelicFloorData.relic)
+			return {
+				...val,
+				...bossRelicPickedData,
+				floor: bossRelicFloorData.floor
 			}
 		}
 
