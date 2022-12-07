@@ -45,47 +45,46 @@ const cardNames = [
 
 // card functions
 const masterDeck = (arr) => {
-	const reduced = arr.reduce((accum, curr) => { 		// runs a reduce to turn the master deck into an array of objects
+	const masterDeckObj = arr.reduce((accum, curr) => { 		// runs a reduce to turn the master deck into an array of objects
 		return {
 			...accum,
 			[curr]: (accum[curr] || 0) + 1
 		}
 	}, {})
 
-	const cardDataObj = Object.entries(reduced).map(([name, copies]) => {
+	const updateCardNames = (arr) => {
+		const cards = arr.map((val) => {
+			const findOutdatedCards = cardNames.find(c => c.oldName === val.baseCardName)
+			const upgradeInt = parseInt(val.card_upgrade, 10)
+			return findOutdatedCards ? {
+				...val,
+				base_card_name: findOutdatedCards.newName,
+				card_name: upgradeInt === 1 ? `${findOutdatedCards.newName}+1` : findOutdatedCards.newName,
+				card_upgrade: upgradeInt
+			} : { ...val, card_upgrade: upgradeInt };
+		})
+		return cards
+	}
+
+	const cardDataObj = Object.entries(masterDeckObj).map(([name, copies]) => {
 		const slicedName = name.slice(-3)		// gets the last 3 characters of the card name:
 		const plusIdx = slicedName.indexOf('+')		// random characters = unupgraded card; [char]+1 = upgraded card; +[num] = card upgraded multiple times, ie. ironclad's searing blow, downfall guardian's refracted beam
 		const charAfterPlusNaN = !Number.isNaN(parseInt(slicedName.charAt(plusIdx + 1)))		// converts the character after the plus to a number, and checks if the character is NOT NaN, meaning it checks if it is a valid number. 
 		// console.log(`${name}: ${charAfterPlusNaN}. ${charAfterPlusNaN ? 'upgraded' : 'NOT unupgraded'}`) 		// valid number (should) mean upgraded card
 		const isUpgradedCard = plusIdx > -1 && charAfterPlusNaN
-
 		return {
-			baseCardName: isUpgradedCard ? name.slice(0, name.indexOf('+')) : name,
-			cardName: name,
+			base_card_name: isUpgradedCard ? name.slice(0, name.indexOf('+')) : name,
+			card_name: name,
 			copies: copies,
-			cardUpgradeValue: isUpgradedCard ? slicedName.slice(plusIdx + 1) : 0
+			card_upgrade: isUpgradedCard ? slicedName.slice(plusIdx + 1) : 0
 		}
 	})
-	return cardDataObj
-}
-
-const updateCardNames = (arr) => {
-	const cards = arr.map((val) => {
-		const findOutdatedCards = cardNames.find(c => c.oldName === val.baseCardName)
-		const upgradeInt = parseInt(val.cardUpgradeValue, 10)
-		return findOutdatedCards ? {
-			...val,
-			baseCardName: findOutdatedCards.newName,
-			cardName: upgradeInt === 1 ? `${findOutdatedCards.newName}+1` : findOutdatedCards.newName,
-			cardUpgradeValue: upgradeInt
-		} : { ...val, cardUpgradeValue: upgradeInt };
-	})
-	return cards
+	return updateCardNames(cardDataObj)
 }
 
 // floors / pathing
 const runPathing = (data) => {
-	const { campfire_choices, damage_taken, path_per_floor, path_taken, card_choices, event_choices, boss_relics, potions_obtained, gold_per_floor, items_purchased, item_purchase_floors, items_purged_floors, items_purged, relics_obtained } = data
+	const { path_per_floor, path_taken, current_hp_per_floor, gold_per_floor } = data
 
 	const formattedPathPerFloor = path_per_floor.map(val => {
 		if (val === null) {
