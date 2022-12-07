@@ -152,20 +152,25 @@ const runPathing = (data) => {
 		return {
 			orig_type: formattedType.orig_name,
 			type: formattedType.new_name,
-			floor: index + 1
+			floor: index + 1,
+			current_hp: current_hp_per_floor[index],
+			current_gold: gold_per_floor[index]
 		}
 	})
 
-	const returnNodes = (node) => {
-		return floorData.filter(fd => fd.orig_type === node).map(val => {
-			switch (node) {
+	const returnNodes = () => {
+		return floorData.map(val => {
+			switch (val.orig_type) {
 				case "M":
 				case "QM":
 				case "E":
 				case "BOSS":
+					const {damage_taken, card_choices, potions_obtained} = data
 					const fightData = damage_taken.find(m => m.floor === val.floor)
 					const cardData = card_choices.find(c => c.floor === val.floor)
 					const potionData = potions_obtained.find(p => p.floor === val.floor)
+					// add relic data for elites
+					const relicData = data.relics_obtained.find(r => r.floor === val.floor)
 					return {
 						...val,
 						enemies: fightData.enemies,
@@ -173,9 +178,11 @@ const runPathing = (data) => {
 						turns: fightData.turns,
 						card_picked: cardData ? cardData.picked : null,
 						card_not_picked: cardData ? cardData.not_picked : null,
-						potion_found: potionData ? potionData.key : null
+						potion_found: potionData ? potionData.key : null,
+						relic_found: relicData ? relicData.key : null
 					}
 				case "R":
+					const {campfire_choices} = data
 					const restData = campfire_choices.find(camp => camp.floor === val.floor)
 					return {
 						...val,
@@ -184,6 +191,7 @@ const runPathing = (data) => {
 					}
 				case "$":
 				case "Q$":
+					const {item_purchase_floors, items_purchased, items_purged_floors, items_purged} = data
 					const shopPurchases = item_purchase_floors.map((shopFloor, index) => ({ floor: shopFloor, purchase: items_purchased[index] }))
 					const purchasesPerFloor = shopPurchases.filter(sp => sp.floor === val.floor)
 
@@ -199,65 +207,107 @@ const runPathing = (data) => {
 				case "T":
 				case "QT":
 					const { blue_key_relic_skipped_log: blue_key_log } = data;
-					const treasureData = relics_obtained.find(treasureFloor => treasureFloor.floor === val.floor)
+					const treasureData = data.relics_obtained.find(treasureFloor => treasureFloor.floor === val.floor)
 					return {
 						...val,
 						skipped_relic: !Boolean(treasureData),
 						found_relic: treasureData ? treasureData.key : `Skipped ${blue_key_log ? blue_key_log.relicID : "unavailable"} for Blue Key (Skipped relic not available for old runs)`
 					}
 				case "QEV":
+					const {event_choices} = data
 					const eventData = event_choices.find(eventFloor => eventFloor.floor === val.floor)
 					return {
 						...val,
 						...eventData
 					}
+				case "AB":
+					const {boss_relics} = data
+					const obtainStats = data.relic_stats.obtain_stats[0]
+					const reduceObtainStatsToArr = Object.entries(obtainStats).reduce((total, current) => {
+						return [
+							...total,
+							{
+								relic_name: current[0],
+								floor_obtained: current[1]
+							}
+						]
+					}, [])
+					const foundBossRelics = reduceObtainStatsToArr.find(b => b.floor_obtained === val.floor)
+					const skippedRelics = foundBossRelics && boss_relics.find(g => g.picked === foundBossRelics.relic_name)
+					return {
+						...val, 
+						boss_picked_relic: foundBossRelics ? foundBossRelics.relic_name : null,
+						boss_skipped_relic: skippedRelics ? skippedRelics.not_picked : null 
+					}
 			}
 		})
 	}
 
-	// combats
-	const hallwayNodes = returnNodes("M")
-	const eventCombatNodes = returnNodes("QM")
-	const eliteNodes = returnNodes("E")
-	const bossNodes = returnNodes("BOSS")
+	return returnNodes()
+}
 
-	// rest sites
-	const restSiteNodes = returnNodes("R")
+const runInfo = (runData) => {
+	const {victory, ascension_level, floor_reached, playtime, score, score_breakdown, seed_played, character_chosen} = runData
 
-	// shops
-	const shopNodes = returnNodes("$")
-	const eventShopNodes = returnNodes("Q$")
-
-	// relics
-	const relicNodes = returnNodes("T")
-	const eventRelicNodes = returnNodes("QT")
-
-	// events
-	const eventNodes = returnNodes("QEV")
-
+	const formatSecondsToHours = seconds => {
+		let date = new Date()
+		date.setSeconds(seconds)
+		return date.toISOString().substr(11, 8)
+	}
 	return {
-		hallway_combats: hallwayNodes,
-		event_combats: eventCombatNodes,
-		elites: eliteNodes,
-		bosses: bossNodes,
-		rest_sites: restSiteNodes,
-		shops: shopNodes,
-		event_shops: eventShopNodes,
-		relics: relicNodes,
-		event_relics: eventRelicNodes,
-		events: eventNodes
+		ascension_level,
+		floor_reached,
+		victory: victory,
+		run_time: formatSecondsToHours(playtime),
+		score,
+		score_breakdown,
+		seed: seed_played,
+		character: character_chosen
 	}
 }
 
+const relicData = (data) => {
+	const {relics_obtained, relic_stats} = data
+
+	/*
+		relics_obtained: [{floor: x, key: relic}]
+		relic_stats: {relic: x, relic2: y} -> [{relic_name: relic, relic_stat: x}]
+	*/
+	const {obtain_stats, counters, ...filterRelicStats} = relic_stats
+	const relicReducer = (relicObj, key) => {
+		return Object.entries(relicObj).reduce((total, current) => [...total, {relic_name: current[0], [key]: current[1]}],[])
+	}
+	const relicStats = relicReducer(filterRelicStats, "relic_stats")
+	const relicFloors = relicReducer(obtain_stats[0], "floor_found")
+
+	// obtain_stats - some are integers, some are arrays
+	// might change all ints to arrs
+	  // map
+	  const allRelicData = relicStats.map(val => {
+		const foundRelic = relicFloors.find(x => x.relic_name === val.relic_name)
+		return {
+			...val,
+			floor_found: foundRelic && foundRelic.floor_found
+		}
+	  })
+	return allRelicData
+}
 
 // routes
 app.post("/upload", async (req, res) => {
-	const data = fs.readFileSync('uploads/silent_shivs.json')
-	const dataJSON = JSON.parse(data)
-	const formattedDeck = masterDeck(dataJSON.master_deck)
-	const updatedCards = updateCardNames(formattedDeck)
-	const runPath = runPathing(dataJSON)
-	res.json(runPath)
+	const rawRunData = fs.readFileSync('uploads/silent_blackstar.json')
+	const rawRunDataJSON = JSON.parse(rawRunData)
+	const formatDeck = masterDeck(rawRunDataJSON.master_deck)
+	const formatRunHistory = runPathing(rawRunDataJSON)
+	const formatRunInfo = runInfo(rawRunDataJSON)
+	const formatRelicList = relicData(rawRunDataJSON)
+	const runNodes = {
+		...formatRunInfo,
+		run_nodes: formatRunHistory,
+		final_deck: formatDeck,
+		relics_obtained: formatRelicList
+	}
+	res.json(runNodes)
 })
 
 // works - putting aside for now to use hardcoded
