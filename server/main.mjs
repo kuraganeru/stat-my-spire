@@ -3,6 +3,7 @@ import multer from 'multer'
 import cors from "cors"
 import * as fs from 'fs'
 import path from 'path'
+import { readFile } from 'fs/promises';
 
 // just testing branching...for use when switching PCs
 
@@ -294,8 +295,15 @@ const relicData = (data) => {
 }
 
 // routes
+app.get("/run", async (req, res) => { // currently hardcoded while scaffolding frontend
+	const sampleRunData = JSON.parse(
+		await readFile(new URL('./uploads/silent_formatted.json', import.meta.url))
+	)
+	res.json(sampleRunData)
+})
+
 app.post("/upload", async (req, res) => {
-	const rawRunData = fs.readFileSync('uploads/silent_blackstar.json')
+	const rawRunData = fs.readFileSync('uploads/silent.json')
 	const rawRunDataJSON = JSON.parse(rawRunData)
 	const formatDeck = masterDeck(rawRunDataJSON.master_deck)
 	const formatRunHistory = runPathing(rawRunDataJSON)
