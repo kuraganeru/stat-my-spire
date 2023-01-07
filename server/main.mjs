@@ -294,6 +294,20 @@ const relicData = (data) => {
 	return allRelicData
 }
 
+const formatRunData = rawRunData => {
+	const rawRunDataJSON = JSON.parse(rawRunData)
+	const formatDeck = masterDeck(rawRunDataJSON.master_deck)
+	const formatRunHistory = runPathing(rawRunDataJSON)
+	const formatRunInfo = runInfo(rawRunDataJSON)
+	const formatRelicList = relicData(rawRunDataJSON)
+	return {
+		...formatRunInfo,
+		run_nodes: formatRunHistory,
+		final_deck: formatDeck,
+		relics_obtained: formatRelicList
+	}
+}
+
 // routes
 app.get("/run", async (req, res) => { // currently hardcoded while scaffolding frontend
 	const sampleRunData = JSON.parse(
@@ -318,16 +332,12 @@ app.post("/upload", async (req, res) => {
 	res.json(runNodes)
 })
 
-// works - putting aside for now to use hardcoded
-app.post("/upload_files", upload.single("files"), (req, res) => {
+app.post("/upload_files", upload.single("runData"), (req, res) => {
+	// multer upload.single(<str>) must match formData.append(<str>) on front-end formData creation
 	const filePath = req.file.path
-
-	// read file
-	const data = fs.readFileSync(filePath)
-	const runDataJSON = JSON.parse(data)
-	const formattedDeck = masterDeck(runDataJSON.master_deck)
-	console.log(`Cards: ${JSON.stringify(masterDeck(runDataJSON.master_deck))}`)
-	res.json(formattedDeck)
+	const rawRunData = fs.readFileSync(filePath)
+	const formattedRunData = formatRunData(rawRunData)
+	res.json(formattedRunData)
 })
 
 app.listen(5000, () => {
