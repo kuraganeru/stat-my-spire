@@ -4,58 +4,51 @@ import './App.css'
 import { useEffect } from 'react'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [run, setRun] = useState({})
+  const [rawRun, setRawRun] = useState('')
+  const [formattedRun, setFormattedRun] = useState({})
 
-  const getRunData = async () => {
-    const response = await fetch('http://localhost:5000/run')
-    const responseJSON = await response.json()
-    setRun(responseJSON)
+  const handleSubmit = e => {
+    e.preventDefault();
+    
+    // create formdata
+    let formData = new FormData();
+    formData.append('runData', rawRun)
+
+    // upload formdata to backend
+    const uploadRunData = async () => {
+      const response = await fetch('http://localhost:5000/upload_files', {
+        method: "POST",
+        body: formData
+      })
+      const responseJSON = await response.json();
+      setFormattedRun(responseJSON)
+    }
+    uploadRunData()
+    // console.log(formattedRun) doesn't work here! see useeffect below
   }
 
+  const handleSubmitRun = (ev) => {
+    setRawRun(ev.target.files[0])
+  }
+
+  /*
+      good enough explanation: setState / setFormattedRun in the handleSubmit function above is async - it lets the console.log(formattedRun) execute while it sets the value. which is also why the empty console.log on line 27 appears before, if we were to put a console.log at l25 
+  */
   useEffect(() => {
-    getRunData()
-  }, [])
+    // component updated? do this
+    if (Object.keys(formattedRun).length > 0) {
+      console.log(formattedRun)
+    }
+  })
 
   return (
     <div className="App">
       <h1>Stat My Spire</h1>
-      <h3>{run.character}</h3>
-      <h3>Ascension: {run.ascension_level}</h3>
-      <h3>{run.victory ? "Victory!" : "Defeated..."}</h3>
-
-      <div>
-        <h2>Deck:</h2>
-        <ul>
-          {
-            run.final_deck && run.final_deck.map(card => {
-              return <li>{card.card_name} x{card.copies}</li>
-            })
-          }
-        </ul>
-      </div>
-
-      <div>
-        <h2>Relics:</h2>
-        <ul>
-          {
-            run.relics_obtained && run.relics_obtained.map(relic => {
-              return <li>{relic.relic_name}</li>
-            })
-          }
-        </ul>
-      </div>
-
-      <div>
-        <h2>Spire Path:</h2>
-        <ul>
-          {
-            run.run_nodes && run.run_nodes.map(floor => {
-              return <li>Floor {floor.floor}: {floor.type}</li>
-            })
-          }
-        </ul>
-      </div>
+      <form onSubmit={handleSubmit}>
+        <input type="file" name="files" id="files" accept=".run" onChange={handleSubmitRun}  />
+        <button type="submit">Submit</button>
+      </form>
+      <h2>{formattedRun.character}</h2>
     </div>
   )
 }
