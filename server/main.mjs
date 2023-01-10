@@ -249,61 +249,82 @@ const runPathing = (data) => {
 
 const formatCharacterChosen = char => {
 	const charactersArr = [
-		{original_name: "THE_SILENT", formatted_name: "The Silent"}
+		{original_name: "THE_SILENT", formatted_name: "The Silent"},
+		{original_name: "DEFECT", formatted_name: "The Defect"}
 	]
 	return charactersArr.find(character => character.original_name === char).formatted_name
 }
 
 const getNeowBonusCard = (bonus, card_choices) => {
-	if (!bonus.bonus_card || card_choices[0].floor !== 0) {
-		return null;
+	if (!bonus.has_bonus_card || card_choices[0].floor !== 0) {
+		return {picked: null, not_picked: null};
 	}
 	return card_choices[0]
+}
+
+const getNeowBonusRelic = (bonus, relic_stats) => {
+	if (!bonus.has_bonus_relic) {
+		return null
+	}
+	const foundBonusRelicArr = Object.entries(relic_stats.obtain_stats[0]).find(val => val.includes(0))
+	return foundBonusRelicArr[0] //str
 }
 
 const returnNeowBonusesArr = (bonusArr) => {
 	const neowBonusesArr = [
 		{
+			original_name: "RANDOM_COLORLESS", 
+			formatted_name: "Obtain a random colorless card",
+			has_bonus_card: true,
+			has_bonus_relic: false
+		},
+		{
+			original_name: "TWENTY_PERCENT_HP_BONUS", 
+			formatted_name: "Gain 20% Max HP (Depends on character)",
+			has_bonus_card: false,
+			has_bonus_relic: false
+		},
+		{
 			original_name: "RANDOM_COLORLESS_2", 
 			formatted_name: "Choose a rare colorless card to obtain",
-			bonus_card: true,
-			bonus_relic: false
+			has_bonus_card: true,
+			has_bonus_relic: false
 		},
 		{
 			original_name: "REMOVE_TWO", 
 			formatted_name: "Remove 2 cards",
-			bonus_card: false,
-			bonus_relic: false
+			has_bonus_card: false,
+			has_bonus_relic: false
 		},
 		{
 			original_name: "REMOVE_CARD", 
 			formatted_name: "Remove a card",
-			bonus_card: false,
-			bonus_relic: false
+			has_bonus_card: false,
+			has_bonus_relic: false
 		},
 		{
 			original_name: "THREE_ENEMY_KILL", 
 			formatted_name: "Enemies in your first 3 combats will have 1 HP",
-			bonus_card: false,
-			bonus_relic: true
+			has_bonus_card: false,
+			has_bonus_relic: true
 		},
 		{
 			original_name: "BOSS_RELIC", 
 			formatted_name: "Obtain a random boss relic",
-			bonus_card: false,
-			bonus_relic: true
+			has_bonus_card: false,
+			has_bonus_relic: true
 		},
 		{
 			original_name: "UPGRADE_CARD", 
 			formatted_name: "Upgrade a card",
-			bonus_card: false,
-			bonus_relic: false
+			has_bonus_card: false,
+			has_bonus_relic: false
 		},
 		{
 			original_name: "RANDOM_COMMON_RELIC", 
 			formatted_name: "Obtain a random common relic",
-			bonus_card: false,
-			bonus_relic: true
+			has_bonus_card: false,
+			has_bonus_relic: true
 		},
 	]
 	return bonusArr.map(val => {
@@ -313,26 +334,30 @@ const returnNeowBonusesArr = (bonusArr) => {
 
 const returnNeowCosts = cost => {
 	const neowCostsArr = [
-		{original_name: "TEN_PERCENT_HP_LOSS", formatted_name: "Lose 10% Max HP"}
+		{original_name: "TEN_PERCENT_HP_LOSS", formatted_name: "Lose 10% Max HP"},
+		{original_name: "NO_GOLD", formatted_name: "Lose All Gold"},
+		{original_name: "NONE", formatted_Name: ""}
 	]
 	return neowCostsArr.find(neowCost => neowCost.original_name === cost).formatted_name
 }
 
-const returnFormattedNeowBonus = (bonus, cost, card_choices, skippedBonuses) => {
+const returnFormattedNeowBonus = (bonus, cost, card_choices, skippedBonuses, relic_stats) => {
 	const chosenBonus = returnNeowBonusesArr(bonus)
 	const chosenCost = returnNeowCosts(cost)
-	
 	return {
-		neow_bonus_chosen: chosenBonus[0],
+		neow_bonus_chosen: {
+			...chosenBonus[0], 
+			bonus_cards: getNeowBonusCard(chosenBonus[0], card_choices),
+			bonus_relic: getNeowBonusRelic(chosenBonus[0], relic_stats)
+		},
 		neow_cost_chosen: chosenCost,
-		neow_card_chosen: getNeowBonusCard(chosenBonus[0], card_choices),
 		neow_skipped: returnNeowBonusesArr(skippedBonuses)
 		// put neow_relic here
 	}
 }
 
 const runInfo = (runData) => {
-	const {victory, ascension_level, floor_reached, playtime, score, score_breakdown, seed_played, character_chosen, neow_bonus, neow_cost, card_choices, neow_bonuses_skipped_log} = runData
+	const {victory, ascension_level, floor_reached, playtime, score, score_breakdown, seed_played, character_chosen, neow_bonus, neow_cost, card_choices, neow_bonuses_skipped_log, relic_stats} = runData
 
 	const formatSecondsToHours = seconds => {
 		let date = new Date()
@@ -351,7 +376,7 @@ const runInfo = (runData) => {
 		score_breakdown,
 		seed: seed_played,
 		character: formatCharacterChosen(character_chosen),
-		neow_bonus: returnFormattedNeowBonus(neowBonusArr, neow_cost, card_choices, neow_bonuses_skipped_log)
+		neow_bonus: returnFormattedNeowBonus(neowBonusArr, neow_cost, card_choices, neow_bonuses_skipped_log, relic_stats)
 	}
 }
 
@@ -372,13 +397,14 @@ const relicData = (data) => {
 	// obtain_stats - some are integers, some are arrays
 	// might change all ints to arrs
 	  // map
-	  const allRelicData = relicStats.map(val => {
-		const foundRelic = relicFloors.find(x => x.relic_name === val.relic_name)
+	const allRelicData = relicFloors.map(val => {
+		const foundRelicWithStats = relicStats.find(x => x.relic_name === val.relic_name)
 		return {
 			...val,
-			floor_found: foundRelic && foundRelic.floor_found
+			floor_found: val.floor_found,
+			relic_stats: foundRelicWithStats ? foundRelicWithStats.relic_stats : null
 		}
-	  })
+	})
 	return allRelicData
 }
 
