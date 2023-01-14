@@ -11,7 +11,10 @@ const getNeowBonusRelic = (bonus, relic_stats) => {
 	if (bonus && !bonus.has_bonus_relic) {
 		return null
 	}
-	const foundBonusRelicArr = Object.entries(relic_stats.obtain_stats[0]).find(val => val.includes(0))
+    const starterRelics = ["Burning Blood", "Ring of the Snake", "Cracked Core", "Pure Water"]
+	const foundBonusRelicArr = Object.entries(relic_stats.obtain_stats[0]).find(val => {
+        return !val.some(x => starterRelics.includes(x)) && val.includes(0)
+    })
 	return foundBonusRelicArr[0] //str
 }
 
