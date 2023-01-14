@@ -7,6 +7,7 @@ import { readFile } from 'fs/promises';
 
 // code modules
 import {cardNames} from "./game_data/cardNames.mjs"
+import { charactersList } from './game_data/characters.mjs'
 import {returnFormattedDeck} from "./modules/formatDeck.mjs"
 
 
@@ -230,13 +231,7 @@ const runPathing = (data) => {
 }
 
 const formatCharacterChosen = char => {
-	const charactersArr = [
-		{original_name: "THE_SILENT", formatted_name: "The Silent"},
-		{original_name: "DEFECT", formatted_name: "The Defect"},
-		{original_name: "IRONCLAD", formatted_name: "The Ironclad"},
-		{original_name: "WATCHER", formatted_name: "The Watcher"}
-	]
-	return charactersArr.find(character => character.original_name === char).formatted_name
+	return charactersList.find(character => character.original_name === char).formatted_name
 }
 
 const getNeowBonusCard = (bonus, card_choices) => {
