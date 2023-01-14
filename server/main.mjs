@@ -8,6 +8,7 @@ import { readFile } from 'fs/promises';
 // code modules
 import {cardNames} from "./game_data/cardNames.mjs"
 import { charactersList } from './game_data/characters.mjs'
+import { neowBonuses, neowCosts } from './game_data/neow.mjs'
 import {returnFormattedDeck} from "./modules/formatDeck.mjs"
 
 
@@ -250,80 +251,13 @@ const getNeowBonusRelic = (bonus, relic_stats) => {
 }
 
 const returnNeowBonusesArr = (bonusArr) => {
-	const neowBonusesArr = [
-		{
-			original_name: "RANDOM_COLORLESS", 
-			formatted_name: "Obtain a random colorless card",
-			has_bonus_card: true,
-			has_bonus_relic: false
-		},
-		{
-			original_name: "TWENTY_PERCENT_HP_BONUS", 
-			formatted_name: "Gain 20% Max HP (Depends on character)",
-			has_bonus_card: false,
-			has_bonus_relic: false
-		},
-		{
-			original_name: "RANDOM_COLORLESS_2", 
-			formatted_name: "Choose a rare colorless card to obtain",
-			has_bonus_card: true,
-			has_bonus_relic: false
-		},
-		{
-			original_name: "REMOVE_TWO", 
-			formatted_name: "Remove 2 cards",
-			has_bonus_card: false,
-			has_bonus_relic: false
-		},
-		{
-			original_name: "REMOVE_CARD", 
-			formatted_name: "Remove a card",
-			has_bonus_card: false,
-			has_bonus_relic: false
-		},
-		{
-			original_name: "THREE_ENEMY_KILL", 
-			formatted_name: "Enemies in your first 3 combats will have 1 HP",
-			has_bonus_card: false,
-			has_bonus_relic: true
-		},
-		{
-			original_name: "BOSS_RELIC", 
-			formatted_name: "Obtain a random boss relic",
-			has_bonus_card: false,
-			has_bonus_relic: true
-		},
-		{
-			original_name: "UPGRADE_CARD", 
-			formatted_name: "Upgrade a card",
-			has_bonus_card: false,
-			has_bonus_relic: false
-		},
-		{
-			original_name: "RANDOM_COMMON_RELIC", 
-			formatted_name: "Obtain a random common relic",
-			has_bonus_card: false,
-			has_bonus_relic: true
-		},
-		{
-			original_name: "THREE_RARE_CARDS", 
-			formatted_name: "Choose a rare card to obtain",
-			has_bonus_card: true,
-			has_bonus_relic: false
-		},
-	]
 	return bonusArr.map(val => {
-		return neowBonusesArr.find(neowBonus => neowBonus.original_name === val)
+		return neowBonuses.find(neowBonus => neowBonus.original_name === val)
 	})
 }
 
 const returnNeowCosts = cost => {
-	const neowCostsArr = [
-		{original_name: "TEN_PERCENT_HP_LOSS", formatted_name: "Lose 10% Max HP"},
-		{original_name: "NO_GOLD", formatted_name: "Lose All Gold"},
-		{original_name: "NONE", formatted_Name: ""}
-	]
-	return neowCostsArr.find(neowCost => neowCost.original_name === cost).formatted_name
+	return neowCosts.find(neowCost => neowCost.original_name === cost).formatted_name
 }
 
 const returnFormattedNeowBonus = (bonus, cost, card_choices, skippedBonuses, relic_stats) => {
