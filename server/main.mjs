@@ -310,6 +310,12 @@ const returnNeowBonusesArr = (bonusArr) => {
 			has_bonus_card: false,
 			has_bonus_relic: true
 		},
+		{
+			original_name: "THREE_RARE_CARDS", 
+			formatted_name: "Choose a rare card to obtain",
+			has_bonus_card: true,
+			has_bonus_relic: false
+		},
 	]
 	return bonusArr.map(val => {
 		return neowBonusesArr.find(neowBonus => neowBonus.original_name === val)
