@@ -29,3 +29,7 @@ test("Returns a card received from Neow bonus, if it exists", () => {
     expect(nb.getNeowBonusCard(formattedCardBonus, floorZero)).toEqual(returnedNeowCardBonus)
     expect(nb.getNeowBonusCard(noCardBonus, floorOne)).toEqual(returnedNotCardBonus)
 })
+
+test("Returns a relic received from Neow bonus, if it exists", () => {
+    
+})
