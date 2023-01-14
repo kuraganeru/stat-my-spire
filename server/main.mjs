@@ -6,7 +6,7 @@ import path from 'path'
 import { readFile } from 'fs/promises';
 
 // code modules
-import {cardNames} from "./modules/cardNames.mjs"
+import {cardNames} from "./game_data/cardNames.mjs"
 import {returnFormattedDeck} from "./modules/formatDeck.mjs"
 
 

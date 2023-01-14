@@ -1,4 +1,4 @@
-import { cardNames } from "./cardNames.mjs"
+import { cardNames } from "../game_data/cardNames.mjs"
 
 /*
     Checks if a card is using an outdated name, and returns an object containing information about the card - the original name, new name, and if it is upgraded.
