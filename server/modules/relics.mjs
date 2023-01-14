@@ -1,16 +1,24 @@
+/*
+    Runs a reducer on an object of relics, which converts it into an array of relic objects.
+    "key" refers to the value passed in with relicObj - will be an integer, either referring to the floor a relic was found OR a relic's stats, if it exists
+*/
+const formatRelicObjectToArray = (relicObj, key) => {
+    return Object.entries(relicObj).reduce((totalValue, currentValue) => {
+        return [
+            ...totalValue,
+            {
+                relic_name: currentValue[0],
+                [key]: currentValue[1]
+            }
+        ]
+    }, [])
+}
+
 const relicData = (data) => {
 	const {relics_obtained, relic_stats} = data
 
-	/*
-		relics_obtained: [{floor: x, key: relic}]
-		relic_stats: {relic: x, relic2: y} -> [{relic_name: relic, relic_stat: x}]
-	*/
-	const {obtain_stats, counters, ...filterRelicStats} = relic_stats
-	const relicReducer = (relicObj, key) => {
-		return Object.entries(relicObj).reduce((total, current) => [...total, {relic_name: current[0], [key]: current[1]}],[])
-	}
-	const relicStats = relicReducer(filterRelicStats, "relic_stats")
-	const relicFloors = relicReducer(obtain_stats[0], "floor_found")
+    const relicStats = formatRelicObjectToArray(filterRelicStats, "relic_stats")
+    const relicFloors = formatRelicObjectToArray(obtain_stats[0], "floor_found")
 
 	// obtain_stats - some are integers, some are arrays
 	// might change all ints to arrs
