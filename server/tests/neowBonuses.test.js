@@ -7,16 +7,25 @@ test("Returns a card received from Neow bonus, if it exists", () => {
         has_bonus_card: true,
         has_bonus_relic: false
     }
-    const neowCardBonus = [
+    const noCardBonus = {
+        has_bonus_card: false
+    }
+    const floorZero = [
         {
             not_picked: ['Thinking Ahead', 'Metamorphosis'],
             picked: 'Master of Strategy',
             floor: 0
         }]
+    const floorOne = {
+        floor: 1
+    }
     const returnedNeowCardBonus = {
         not_picked: ['Thinking Ahead', 'Metamorphosis'],
         picked: 'Master of Strategy',
         floor: 0
     }
-    expect(nb.getNeowBonusCard(formattedCardBonus, neowCardBonus)).toEqual(returnedNeowCardBonus)
+    const returnedNotCardBonus = {picked: null, not_picked: null}
+
+    expect(nb.getNeowBonusCard(formattedCardBonus, floorZero)).toEqual(returnedNeowCardBonus)
+    expect(nb.getNeowBonusCard(noCardBonus, floorOne)).toEqual(returnedNotCardBonus)
 })
