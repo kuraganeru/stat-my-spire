@@ -36,9 +36,6 @@ const relicData = (data) => {
     const relicStats = formatRelicObjectToArray(filterRelicStats, "relic_stats")
     const relicFloors = formatRelicObjectToArray(obtain_stats[0], "floor_found")
 
-    // obtain_stats - some are integers, some are arrays
-    // might change all ints to arrs
-    // map
     const formattedRelicData = formatAllRelicData(relicFloors, relicStats)
     return formattedRelicData
 }
