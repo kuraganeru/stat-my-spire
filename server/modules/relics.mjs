@@ -14,6 +14,17 @@ const formatRelicObjectToArray = (relicObj, key) => {
     }, [])
 }
 
+const formatAllRelicData = (relicFloors, relicStats) => {
+    return relicFloors.map(relFloor => {
+        const foundRelicWithStats = relicStats.find(relStat => relStat.relic_name === relFloor.relic_name)
+        return {
+            ...relFloor,
+            floor_found: relFloor.floor_found,
+            relic_stats: foundRelicWithStats ? foundRelicWithStats.relic_stats : null
+        }
+    })
+}
+
 const relicData = (data) => {
     const { relic_stats } = data
 
@@ -26,15 +37,8 @@ const relicData = (data) => {
     // obtain_stats - some are integers, some are arrays
     // might change all ints to arrs
     // map
-    const allRelicData = relicFloors.map(val => {
-        const foundRelicWithStats = relicStats.find(x => x.relic_name === val.relic_name)
-        return {
-            ...val,
-            floor_found: val.floor_found,
-            relic_stats: foundRelicWithStats ? foundRelicWithStats.relic_stats : null
-        }
-    })
-    return allRelicData
+    const formattedRelicData = formatAllRelicData(relicFloors, relicStats)
+    return formattedRelicData
 }
 
 export { relicData }
