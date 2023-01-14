@@ -1,7 +1,8 @@
 /*
     Runs a reducer on an object of relics, which converts it into an array of relic objects.
-    "key" refers to the value passed in with relicObj - will be an integer, either referring to the floor a relic was found OR a relic's stats, if it exists
-    --incorrect - can be an array, or a string. will need to update
+    "key" refers to the value passed in with relicObj
+        floor_found: integer
+        relic_stats: array
 */
 const formatRelicObjectToArray = (relicObj, key) => {
     return Object.entries(relicObj).reduce((totalValue, currentValue) => {
