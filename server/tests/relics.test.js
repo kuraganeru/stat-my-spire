@@ -16,7 +16,7 @@ test("Returns an array of relic objects", () => {
     }
     const expectedStats = [
         { relic_name: 'Calipers', relic_stats: [ 582 ] },
-        { relic_name: 'Shovel', relic_stats: 1 },
+        { relic_name: 'Shovel', relic_stats: [1] },
         {
           relic_name: "Pandora's Box",
           relic_stats: [
