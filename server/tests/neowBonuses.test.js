@@ -24,12 +24,21 @@ test("Returns a card received from Neow bonus, if it exists", () => {
         picked: 'Master of Strategy',
         floor: 0
     }
-    const returnedNotCardBonus = {picked: null, not_picked: null}
+    const returnedNotCardBonus = { picked: null, not_picked: null }
 
     expect(nb.getNeowBonusCard(formattedCardBonus, floorZero)).toEqual(returnedNeowCardBonus)
     expect(nb.getNeowBonusCard(noCardBonus, floorOne)).toEqual(returnedNotCardBonus)
 })
 
 test("Returns a relic received from Neow bonus, if it exists", () => {
-    
+    const formattedCardBonus = {
+        has_bonus_relic: true
+    }
+
+    const relicList = {
+        obtain_stats: [{"Ring of the Snake": 0, "Vajra": 0}]
+    }
+
+    const expected = "Vajra"
+    expect(nb.getNeowBonusRelic(formattedCardBonus, relicList)).toEqual(expected)
 })
