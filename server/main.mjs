@@ -7,8 +7,8 @@ import { readFile } from 'fs/promises';
 
 // code modules
 import { charactersList } from './game_data/characters.mjs'
-import { neowBonuses, neowCosts } from './game_data/neow.mjs'
 import {returnFormattedDeck} from "./modules/formatDeck.mjs"
+import { returnFormattedNeowBonus } from './modules/neowBonuses.mjs'
 
 
 // express
@@ -221,20 +221,20 @@ const returnNeowCosts = cost => {
 	return neowCosts.find(neowCost => neowCost.original_name === cost).formatted_name
 }
 
-const returnFormattedNeowBonus = (bonus, cost, card_choices, skippedBonuses, relic_stats) => {
-	const chosenBonus = returnNeowBonusesArr(bonus)
-	const chosenCost = returnNeowCosts(cost)
-	return {
-		neow_bonus_chosen: {
-			...chosenBonus[0], 
-			bonus_cards: getNeowBonusCard(chosenBonus[0], card_choices),
-			bonus_relic: getNeowBonusRelic(chosenBonus[0], relic_stats)
-		},
-		neow_cost_chosen: chosenCost,
-		neow_skipped: returnNeowBonusesArr(skippedBonuses)
-		// put neow_relic here
-	}
-}
+// const returnFormattedNeowBonus = (bonus, cost, card_choices, skippedBonuses, relic_stats) => {
+// 	const chosenBonus = returnNeowBonusesArr(bonus)
+// 	const chosenCost = returnNeowCosts(cost)
+// 	return {
+// 		neow_bonus_chosen: {
+// 			...chosenBonus[0], 
+// 			bonus_cards: getNeowBonusCard(chosenBonus[0], card_choices),
+// 			bonus_relic: getNeowBonusRelic(chosenBonus[0], relic_stats)
+// 		},
+// 		neow_cost_chosen: chosenCost,
+// 		neow_skipped: returnNeowBonusesArr(skippedBonuses)
+// 		// put neow_relic here
+// 	}
+// }
 
 const runInfo = (runData) => {
 	const {victory, ascension_level, floor_reached, playtime, score, score_breakdown, seed_played, character_chosen, neow_bonus, neow_cost, card_choices, neow_bonuses_skipped_log, relic_stats} = runData
