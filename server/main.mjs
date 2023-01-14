@@ -29,44 +29,6 @@ var storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
-// card functions
-const masterDeck = (arr) => {
-	const masterDeckObj = arr.reduce((accum, curr) => { 		// runs a reduce to turn the master deck into an array of objects
-		return {
-			...accum,
-			[curr]: (accum[curr] || 0) + 1
-		}
-	}, {})
-
-	const updateCardNames = (arr) => {
-		const cards = arr.map((val) => {
-			const findOutdatedCards = cardNames.find(c => c.oldName === val.baseCardName)
-			const upgradeInt = parseInt(val.card_upgrade, 10)
-			return findOutdatedCards ? {
-				...val,
-				base_card_name: findOutdatedCards.newName,
-				card_name: upgradeInt === 1 ? `${findOutdatedCards.newName}+1` : findOutdatedCards.newName,
-				card_upgrade: upgradeInt
-			} : { ...val, card_upgrade: upgradeInt };
-		})
-		return cards
-	}
-
-	const cardDataObj = Object.entries(masterDeckObj).map(([name, copies]) => {
-		const slicedName = name.slice(-3)		// gets the last 3 characters of the card name:
-		const plusIdx = slicedName.indexOf('+')		// random characters = unupgraded card; [char]+1 = upgraded card; +[num] = card upgraded multiple times, ie. ironclad's searing blow, downfall guardian's refracted beam
-		const charAfterPlusNaN = !Number.isNaN(parseInt(slicedName.charAt(plusIdx + 1)))		// converts the character after the plus to a number, and checks if the character is NOT NaN, meaning it checks if it is a valid number. 
-		const isUpgradedCard = plusIdx > -1 && charAfterPlusNaN
-		return {
-			base_card_name: isUpgradedCard ? name.slice(0, name.indexOf('+')) : name,
-			card_name: name,
-			copies: copies,
-			card_upgrade: isUpgradedCard ? slicedName.slice(plusIdx + 1) : 0
-		}
-	})
-	return updateCardNames(cardDataObj)
-}
-
 // floors / pathing
 const runPathing = (data) => {
 	const { path_per_floor, path_taken, current_hp_per_floor, gold_per_floor } = data
@@ -352,7 +314,6 @@ app.get("/run", async (req, res) => { // currently hardcoded while scaffolding f
 app.post("/upload", async (req, res) => {
 	const rawRunData = fs.readFileSync('uploads/silent.json')
 	const rawRunDataJSON = JSON.parse(rawRunData)
-	const formatDeck = masterDeck(rawRunDataJSON.master_deck)
 	const formatRunHistory = runPathing(rawRunDataJSON)
 	const formatRunInfo = runInfo(rawRunDataJSON)
 	const formatRelicList = relicData(rawRunDataJSON)
