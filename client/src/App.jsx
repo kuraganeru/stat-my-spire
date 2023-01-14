@@ -39,7 +39,7 @@ function App() {
     if (Object.keys(formattedRun).length > 0) {
       console.log(formattedRun)
     }
-  })
+  }, [formattedRun])
 
   return (
     <div className="App">
