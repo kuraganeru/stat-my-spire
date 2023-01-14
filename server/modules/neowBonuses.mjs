@@ -40,4 +40,4 @@ const returnFormattedNeowBonus = (bonus, cost, card_choices, skippedBonuses, rel
 	}
 }
 
-export { returnFormattedNeowBonus}
+export { returnFormattedNeowBonus, getNeowBonusCard, getNeowBonusRelic, returnNeowBonusesArr, returnNeowCosts}
