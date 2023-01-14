@@ -54,7 +54,6 @@ const masterDeck = (arr) => {
 		const slicedName = name.slice(-3)		// gets the last 3 characters of the card name:
 		const plusIdx = slicedName.indexOf('+')		// random characters = unupgraded card; [char]+1 = upgraded card; +[num] = card upgraded multiple times, ie. ironclad's searing blow, downfall guardian's refracted beam
 		const charAfterPlusNaN = !Number.isNaN(parseInt(slicedName.charAt(plusIdx + 1)))		// converts the character after the plus to a number, and checks if the character is NOT NaN, meaning it checks if it is a valid number. 
-		// console.log(`${name}: ${charAfterPlusNaN}. ${charAfterPlusNaN ? 'upgraded' : 'NOT unupgraded'}`) 		// valid number (should) mean upgraded card
 		const isUpgradedCard = plusIdx > -1 && charAfterPlusNaN
 		return {
 			base_card_name: isUpgradedCard ? name.slice(0, name.indexOf('+')) : name,
