@@ -242,7 +242,7 @@ const getNeowBonusCard = (bonus, card_choices) => {
 }
 
 const getNeowBonusRelic = (bonus, relic_stats) => {
-	if (!bonus.has_bonus_relic) {
+	if (bonus && !bonus.has_bonus_relic) {
 		return null
 	}
 	const foundBonusRelicArr = Object.entries(relic_stats.obtain_stats[0]).find(val => val.includes(0))
