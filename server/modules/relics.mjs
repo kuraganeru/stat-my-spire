@@ -15,7 +15,10 @@ const formatRelicObjectToArray = (relicObj, key) => {
 }
 
 const relicData = (data) => {
-	const {relics_obtained, relic_stats} = data
+    const { relic_stats } = data
+
+    // https://dev.to/darksmile92/js-use-spread-to-exclude-properties-1km9
+    const { obtain_stats, counters, ...filterRelicStats } = relic_stats
 
     const relicStats = formatRelicObjectToArray(filterRelicStats, "relic_stats")
     const relicFloors = formatRelicObjectToArray(obtain_stats[0], "floor_found")
