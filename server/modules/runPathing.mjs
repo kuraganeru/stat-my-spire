@@ -8,3 +8,5 @@ const formatPathPerFloor = arr => {
         return val
     })
 }
+
+export { formatPathPerFloor }
