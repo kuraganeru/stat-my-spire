@@ -5,6 +5,9 @@ const formatPathPerFloor = arr => {
         if (val === null) {
             return "AB"
         }
+        if (val === "B") {
+            return "BOSS"
+        }
         return val
     })
 }
