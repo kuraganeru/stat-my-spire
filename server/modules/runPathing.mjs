@@ -23,4 +23,8 @@ const formatPathTaken = arr => {
     return path
 }
 
-export { formatPathPerFloor, formatPathTaken }
+const checkPathEquality = (pathTaken, pathPerFloor) => {
+    return pathTaken.length === pathPerFloor.length && pathPerFloor.every(pathFloor => pathTaken.includes(pathFloor))
+}
+
+export { formatPathPerFloor, formatPathTaken, checkPathEquality }
