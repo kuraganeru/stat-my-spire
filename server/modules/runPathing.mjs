@@ -16,11 +16,11 @@ const formatPathPerFloor = arr => {
 const formatPathTaken = arr => {
     let path = [...arr]
     for (let i = path.length - 1; i >= 0; i--) {
-        if (path[i] === "BOSS" && path[i+1] != "BOSS") {
+        if (path[i] === "BOSS" && path[i + 1] != "BOSS") {
             path.splice(i + 1, 0, "AB")
         }
     }
     return path
 }
 
-export { formatPathPerFloor , formatPathTaken}
+export { formatPathPerFloor, formatPathTaken }
