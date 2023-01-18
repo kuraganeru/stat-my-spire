@@ -1,4 +1,4 @@
-import { formatPathPerFloor, formatPathTaken, checkPathEquality } from "../modules/runPathing.mjs";
+import { formatPathPerFloor, formatPathTaken, checkPathEquality, formatQuestionMarkFloors } from "../modules/runPathing.mjs";
 
 test("Replaces null value with 'AB' or returns original value", () => {
     const with_null = ['M', 'E', null, 'BOSS', null]
@@ -21,4 +21,11 @@ test("checks equality between formatted path_taken and path_per_floor arrays", (
     const pathTaken = [ "M", "M", "$", "M", "M", "E", "?", "R", "T", "M", "?", "E", "R", "$", "R", "BOSS", "M", "M", "M", "?", "?", "E", "?", "M", "T", "E", "?", "E", "M", "M", "R", "BOSS", "M", "?", "$", "M", "$", "?", "E", "R", "T", "?", "E", "M", "?", "E", "R", "BOSS", "R", "$", "E", "BOSS" ]
     const pathFloor = [ "M", "M", "$", "M", "M", "E", "?", "R", "T", "M", "M", "E", "R", "$", "R", "B", null, "M", "M", "M", "?", "?", "E", "?", "M", "T", "E", "?", "E", "M", "M", "R", "B", null, "M", "?", "$", "M", "$", "?", "E", "R", "T", "?", "E", "M", "?", "E", "R", "B", null, "R", "$", "E", "B", null ]
     expect(checkPathEquality(pathTaken, pathFloor)).toBe(true)
+})
+
+test("returns an array with formatted question mark floors", () => {
+    const pathTaken = ['M', '?', '?', '?', '?']
+    const pathFloor = ['M', 'M', '?', 'T', '$']
+    const expected = ['M', 'QM', 'QEV', 'QT', 'Q$']
+    expect(formatQuestionMarkFloors(pathTaken, pathFloor)).toEqual(expected)
 })

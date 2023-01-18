@@ -33,4 +33,28 @@ const checkPathEquality = (pathTaken, pathPerFloor) => {
     return formattedPathTaken.length === formattedPathPerFloor.length && formattedPathPerFloor.every(pathFloor => formattedPathTaken.includes(pathFloor))
 }
 
-export { formatPathPerFloor, formatPathTaken, checkPathEquality }
+/*
+    Replaces "?" floors with a string which indicates what the floor actually is. pathTaken contains a ?, while pathFloor may randomly contain ?, M, $, or T. 
+    if pathTaken[i] is not a ?, ignore the value entirely.
+    if pathTaken[i] IS a ?, reference pathFloor for the "real" value and replace with formatted value.
+*/
+const formatQuestionMarkFloors = (pathTaken, pathFloor) => {
+    return pathTaken.map((floorTaken, index) => {
+        if (floorTaken !== "?") {
+            return floorTaken
+        }
+        switch (pathFloor[index]) {
+            case "?":
+                return "QEV"
+            case "M":
+                return "QM"
+            case "$":
+                return "Q$"
+            case "T":
+                return "QT"
+        }
+    })
+}
+
+
+export { formatPathPerFloor, formatPathTaken, checkPathEquality, formatQuestionMarkFloors }
