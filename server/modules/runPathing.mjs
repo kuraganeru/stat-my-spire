@@ -27,7 +27,7 @@ const formatPathTaken = arr => {
 }
 
 /*
-    Helper function for checking equality between pathTaken and pathPerFloor arrays. Because this is run before replacing question mark rooms, it will inevitably fail an equality test due to ? values differing. This returns an array with the "real" values replaced with "?" to test equality.
+    Helper function for checking equality between pathTaken and pathPerFloor arrays. Because checkPathEquality is run before replacing question mark rooms, it will inevitably return false due to ? values differing. This returns an array with the "real" values replaced with "?" to test equality, given that the question mark values correlate to each other.
 */
 const replaceQuestionMarkFloors = (pathTaken, pathPerFloor) => {
     const questionMarkValues = ["M", "?", "T", "$"]
