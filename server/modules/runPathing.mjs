@@ -72,4 +72,17 @@ const formatQuestionMarkFloors = (pathTaken, pathFloor) => {
     })
 }
 
-export { formatPathPerFloor, formatPathTaken, checkPathEquality, formatQuestionMarkFloors }
+const returnInitialFloorValues = (pathTaken, pathFloor) => {
+    const formattedBasePath = formatQuestionMarkFloors(pathTaken, pathFloor)
+
+    return formattedBasePath.map((floor, index) => {
+        const foundFormattedFloor = floorTypes.find(formattedFloor => formattedFloor.orig_name === floor)
+        return {
+            orig_type: foundFormattedFloor.orig_name,
+            type: foundFormattedFloor.new_name,
+            floor: index + 1
+        }
+    })
+}
+
+export { formatPathPerFloor, formatPathTaken, checkPathEquality, formatQuestionMarkFloors, returnInitialFloorValues }
