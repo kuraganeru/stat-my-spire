@@ -87,4 +87,36 @@ const returnInitialFloorValues = (pathTaken, pathFloor, hpPerFloor, goldPerFloor
     })
 }
 
-export { formatPathPerFloor, formatPathTaken, checkPathEquality, formatQuestionMarkFloors, returnInitialFloorValues }
+const returnAllFloorValues = (initialFloors, runData) => {
+    return initialFloors.map(floor => {
+        switch (floor.orig_type) {
+            case "M":
+            case "QM":
+            case "E":
+            case "BOSS":
+                formatCombatFloors(floor, runData)
+        }
+    })
+}
+
+const formatCombatFloors = (floorData, runData) => {
+    const { damage_taken, card_choices, potions_obtained, relics_obtained } = runData;
+
+    const combatResultOnFloor = damage_taken.find(combatResult => combatResult.floor === floorData.floor)
+    const cardsOfferedOnFloor = card_choices.find(cardOffered => cardOffered.floor === floorData.floor)
+    const potionOfferedOnFloor = potions_obtained.find(potionOffered => potionOffered.floor === floorData.floor)
+    const relicsFoundOnFloor = relics_obtained.find(relicsFound => relicsFound.floor === floorData.floor)
+
+    return {
+        ...floorData,
+        enemies: combatResultOnFloor.enemies,
+        damage_taken: combatResultOnFloor.damage,
+        turns_taken: combatResultOnFloor.turns,
+        card_picked: cardsOfferedOnFloor ? cardsOfferedOnFloor.picked : null,
+        card_not_picked: cardsOfferedOnFloor ? cardsOfferedOnFloor.not_picked : null,
+        potion_found: potionOfferedOnFloor ? potionOfferedOnFloor.key : null,
+        relics_found: relicsFoundOnFloor ? relicsFoundOnFloor.key : null
+    }
+}
+
+export { formatPathPerFloor, formatPathTaken, checkPathEquality, formatQuestionMarkFloors, returnInitialFloorValues, returnAllFloorValues }
