@@ -94,7 +94,7 @@ const returnAllFloorValues = (initialFloors, runData) => {
             case "QM":
             case "E":
             case "BOSS":
-                formatCombatFloors(floor, runData)
+                return formatCombatFloors(floor, runData)
         }
     })
 }
