@@ -72,7 +72,7 @@ const formatQuestionMarkFloors = (pathTaken, pathFloor) => {
     })
 }
 
-const returnInitialFloorValues = (pathTaken, pathFloor) => {
+const returnInitialFloorValues = (pathTaken, pathFloor, hpPerFloor, goldPerFloor) => {
     const formattedBasePath = formatQuestionMarkFloors(pathTaken, pathFloor)
 
     return formattedBasePath.map((floor, index) => {
@@ -80,7 +80,9 @@ const returnInitialFloorValues = (pathTaken, pathFloor) => {
         return {
             orig_type: foundFormattedFloor.orig_name,
             type: foundFormattedFloor.new_name,
-            floor: index + 1
+            floor: index + 1,
+            current_hp: hpPerFloor[index],
+            current_gold: goldPerFloor[index]
         }
     })
 }
