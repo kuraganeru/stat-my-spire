@@ -87,20 +87,20 @@ const returnInitialFloorValues = (pathTaken, pathFloor, hpPerFloor, goldPerFloor
     })
 }
 
-const returnAllFloorValues = (initialFloors, runData) => {
+const returnAllFloorValues = (initialFloors, rawRunData) => {
     return initialFloors.map(floor => {
         switch (floor.orig_type) {
             case "M":
             case "QM":
             case "E":
             case "BOSS":
-                return formatCombatFloors(floor, runData)
+                return formatCombatFloors(floor, rawRunData)
         }
     })
 }
 
-const formatCombatFloors = (floorData, runData) => {
-    const { damage_taken, card_choices, potions_obtained, relics_obtained } = runData;
+const formatCombatFloors = (floorData, rawRunData) => {
+    const { damage_taken, card_choices, potions_obtained, relics_obtained } = rawRunData;
 
     const combatResultOnFloor = damage_taken.find(combatResult => combatResult.floor === floorData.floor)
     const cardsOfferedOnFloor = card_choices.find(cardOffered => cardOffered.floor === floorData.floor)
