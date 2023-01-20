@@ -1,4 +1,5 @@
-import { formatPathPerFloor, formatPathTaken, checkPathEquality, formatQuestionMarkFloors, returnInitialFloorValues } from "../modules/runPathing.mjs";
+import { formatPathPerFloor, formatPathTaken, checkPathEquality, formatQuestionMarkFloors, returnInitialFloorValues, returnAllFloorValues } from "../modules/runPathing.mjs";
+import { sampleRun } from "../game_data/sampleRun.js";
 
 test("Replaces null value with 'AB' or returns original value", () => {
     const with_null = ['M', 'E', null, 'BOSS', null]
@@ -36,6 +37,30 @@ test("returns an array of formatted floor objects", () => {
     const hp_per_floor = [60, 54, 52]
     const gold_per_floor = [99, 120, 125]
     const expected = [{ orig_type: 'M', type: 'Monster', floor: 1, current_hp: 60, current_gold: 99 }, { orig_type: 'T', type: 'Treasure', floor: 2, current_hp: 54, current_gold: 120 }, { orig_type: 'QEV', type: 'Event', floor: 3, current_hp: 52, current_gold: 125 }]
-    
+
     expect(returnInitialFloorValues(pathTaken, pathFloor, hp_per_floor, gold_per_floor)).toEqual(expected)
+})
+
+test("adds additional data to initial floor array values", () => {
+    const initial = [{ orig_type: 'M', type: 'Monster', floor: 1, current_hp: 63, current_gold: 117 }]
+    
+    const expected = [{
+        "orig_type": "M",
+        "type": "Monster",
+        "floor": 1,
+        "current_hp": 63,
+        "current_gold": 117,
+        "enemies": "Small Slimes",
+        "damage_taken": 0,
+        "turns_taken": 4,
+        "card_picked": "Heel Hook",
+        "card_not_picked": [
+            "Riddle With Holes",
+            "Choke"
+        ],
+        "potion_found": "FairyPotion",
+        "relics_found": null
+    }]
+
+    expect(returnAllFloorValues(initial, sampleRun)).toEqual(expected)
 })
