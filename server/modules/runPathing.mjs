@@ -97,6 +97,9 @@ const returnAllFloorValues = (initialFloors, rawRunData) => {
                 return formatCombatFloors(floor, rawRunData);
             case "R":
                 return formatRestSiteFloors(floor, rawRunData);
+            case "$":
+            case "Q$":
+                return formatShopFloors(floor, rawRunData);
         }
     })
 }
@@ -129,6 +132,34 @@ const formatRestSiteFloors = (floorData, rawRunData) => {
         ...floorData,
         campfire_action: campfireChoiceFoundOnFloor.key,
         upgraded_card: campfireChoiceFoundOnFloor.key === "SMITH" ? campfireChoiceFoundOnFloor.data : null
+    }
+}
+
+const formatShopFloors = (floorData, rawRunData) => {
+    const { item_purchase_floors, items_purchased, items_purged_floors, items_purged } = rawRunData;
+
+    const formatShopPurchases = item_purchase_floors.map((shopFloor, index) => {
+        return {
+            floor: shopFloor, purchase: items_purchased[index]
+        }
+    })
+
+    const itemsPurchasedOnFloor = formatShopPurchases.filter(shopPurchase => shopPurchase.floor === floorData.floor)
+
+    // Finding purchased card removals
+    const formatShopRemovals = items_purged_floors.map((shopFloor, index) => {
+        return {
+            floor: shopFloor,
+            card_removal: items_purged[index]
+        }
+    })
+
+    const cardRemovalFoundOnFloor = formatShopRemovals.find(purchasedRemoval => purchasedRemoval.floor === floorData.floor)
+
+    return {
+        ...floorData,
+        purchases: itemsPurchasedOnFloor.map(shop => shop.purchase),
+        card_removal_choice: cardRemovalFoundOnFloor ? cardRemovalFoundOnFloor.card_removal : null
     }
 }
 
