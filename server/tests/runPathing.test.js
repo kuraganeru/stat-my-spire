@@ -51,6 +51,13 @@ test("adds additional data to initial floor array values", () => {
             current_gold: 117 
         },
         { 
+            orig_type: '$', 
+            type: 'Shop', 
+            floor: 3, 
+            current_hp: 59, 
+            current_gold: 20 
+        },
+        { 
             orig_type: 'R', 
             type: 'Rest Site', 
             floor: 8, 
@@ -75,6 +82,17 @@ test("adds additional data to initial floor array values", () => {
         ],
         "potion_found": "FairyPotion",
         "relics_found": null
+    },
+    {
+        "orig_type": "$",
+        "type": "Shop",
+        "floor": 3,
+        "current_hp": 59,
+        "current_gold": 20,
+        "purchases": [
+            "Flechettes"
+        ],
+        "card_removal_choice": "Strike_G"
     },
     {
         "orig_type": "R",
