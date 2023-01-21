@@ -72,11 +72,11 @@ test("adds additional data to initial floor array values", () => {
             current_gold: 127
         },
         {
-            "orig_type": "AB",
-            "type": "After Boss",
-            "floor": 17,
-            "current_hp": 53,
-            "current_gold": 195
+            orig_type: "AB",
+            type: "After Boss",
+            floor: 17,
+            current_hp: 53,
+            current_gold: 195
         },
         {
             orig_type: "QM",
