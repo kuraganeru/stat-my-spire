@@ -102,6 +102,8 @@ const returnAllFloorValues = (initialFloors, rawRunData) => {
                 return formatShopFloors(floor, rawRunData);
             case "QEV":
                 return formatEventFloors(floor, rawRunData);
+            case "AB":
+                return formatAfterBossFloors(floor, rawRunData);
         }
     })
 }
@@ -179,6 +181,38 @@ const formatEventFloors = (floorData, rawRunData) => {
     return {
         ...floorData,
         ...foundEventResult
+    }
+}
+
+const formatAfterBossFloors = (floorData, rawRunData) => {
+    const { boss_relics, relic_stats } = rawRunData
+
+    const { foundBossRelics, skippedBossRelics } = formatBossRelics(boss_relics, relic_stats, floorData)
+
+    return {
+        ...floorData,
+        boss_picked_relic: foundBossRelics ? foundBossRelics.relic_name : null,
+        boss_skipped_relic: skippedBossRelics ? skippedBossRelics.not_picked : null
+    }
+}
+
+const formatBossRelics = (boss_relics, relic_stats, floorData) => {
+    const obtainStats = relic_stats.obtain_stats[0]
+    const reduceRelicStats = Object.entries(obtainStats).reduce((totalValue, currentValue) => {
+        return [
+            ...totalValue,
+            {
+                relic_name: currentValue[0],
+                floor_obtained: currentValue[1]
+            }
+        ]
+    }, [])
+
+    const foundBossRelics = reduceRelicStats.find(bossRelic => bossRelic.floor_obtained === floorData.floor)
+    const skippedBossRelics = foundBossRelics && boss_relics.find(bossRelic => bossRelic.picked === foundBossRelics.relic_name)
+    return {
+        foundBossRelics,
+        skippedBossRelics
     }
 }
 

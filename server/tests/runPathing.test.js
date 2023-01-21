@@ -70,6 +70,13 @@ test("adds additional data to initial floor array values", () => {
             floor: 11,
             current_hp: 30,
             current_gold: 127
+        },
+        {
+            "orig_type": "AB",
+            "type": "After Boss",
+            "floor": 17,
+            "current_hp": 53,
+            "current_gold": 195
         }
     ]
     
@@ -127,6 +134,18 @@ test("adds additional data to initial floor array values", () => {
         "max_hp_loss": 0,
         "event_name": "The Cleric",
         "gold_loss": 50
+    },
+    {
+        "orig_type": "AB",
+        "type": "After Boss",
+        "floor": 17,
+        "current_hp": 53,
+        "current_gold": 195,
+        "boss_picked_relic": "Coffee Dripper",
+        "boss_skipped_relic": [
+            "Velvet Choker",
+            "SacredBark"
+        ]
     },]
 
     expect(returnAllFloorValues(initial, sampleRun)).toEqual(expected)
