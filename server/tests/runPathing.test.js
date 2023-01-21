@@ -77,6 +77,13 @@ test("adds additional data to initial floor array values", () => {
             "floor": 17,
             "current_hp": 53,
             "current_gold": 195
+        },
+        {
+            orig_type: "QM",
+            type: "Unknown / Monster",
+            floor: 36,
+            current_hp: 70,
+            current_gold: 541
         }
     ]
     
@@ -146,6 +153,23 @@ test("adds additional data to initial floor array values", () => {
             "Velvet Choker",
             "SacredBark"
         ]
+    },
+    {
+        "orig_type": "QM",
+        "type": "Unknown / Monster",
+        "floor": 36,
+        "current_hp": 70,
+        "current_gold": 541,
+        "enemies": "3 Shapes",
+        "damage_taken": 0,
+        "turns_taken": 2,
+        "card_picked": "Deflect+1",
+        "card_not_picked": [
+            "Footwork+1",
+            "Tactician+1"
+        ],
+        "potion_found": null,
+        "relics_found": null
     },]
 
     expect(returnAllFloorValues(initial, sampleRun)).toEqual(expected)
