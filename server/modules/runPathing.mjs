@@ -45,7 +45,7 @@ const checkPathEquality = (pathTaken, pathPerFloor) => {
     const formattedPathTaken = formatPathTaken(pathTaken)
     const formattedPathPerFloor = formatPathPerFloor(pathPerFloor)
     const questionMarkFloors = replaceQuestionMarkFloors(formattedPathTaken, formattedPathPerFloor)
-    
+
     return formattedPathTaken.length === formattedPathPerFloor.length && questionMarkFloors.every((pathFloor, index) => pathFloor === formattedPathTaken[index])
 }
 
@@ -94,7 +94,9 @@ const returnAllFloorValues = (initialFloors, rawRunData) => {
             case "QM":
             case "E":
             case "BOSS":
-                return formatCombatFloors(floor, rawRunData)
+                return formatCombatFloors(floor, rawRunData);
+            case "R":
+                return formatRestSiteFloors(floor, rawRunData);
         }
     })
 }
@@ -116,6 +118,17 @@ const formatCombatFloors = (floorData, rawRunData) => {
         card_not_picked: cardsOfferedOnFloor ? cardsOfferedOnFloor.not_picked : null,
         potion_found: potionOfferedOnFloor ? potionOfferedOnFloor.key : null,
         relics_found: relicsFoundOnFloor ? relicsFoundOnFloor.key : null
+    }
+}
+
+const formatRestSiteFloors = (floorData, rawRunData) => {
+    const { campfire_choices } = rawRunData
+    const campfireChoiceFoundOnFloor = campfire_choices.find(campChoice => campChoice.floor === floorData.floor)
+
+    return {
+        ...floorData,
+        campfire_action: campfireChoiceFoundOnFloor.key,
+        upgraded_card: campfireChoiceFoundOnFloor.key === "SMITH" ? campfireChoiceFoundOnFloor.data : null
     }
 }
 
