@@ -100,6 +100,8 @@ const returnAllFloorValues = (initialFloors, rawRunData) => {
             case "$":
             case "Q$":
                 return formatShopFloors(floor, rawRunData);
+            case "QEV":
+                return formatEventFloors(floor, rawRunData);
         }
     })
 }
@@ -168,6 +170,16 @@ const formatShopPurchases = (item_purchase_floors, items_purchased, floorData) =
     })
 
     return formatShopPurchases.filter(shopPurchase => shopPurchase.floor === floorData.floor)
+}
+
+const formatEventFloors = (floorData, rawRunData) => {
+    const { event_choices } = rawRunData;
+    const foundEventResult = event_choices.find(eventFloor => eventFloor.floor === floorData.floor)
+
+    return {
+        ...floorData,
+        ...foundEventResult
+    }
 }
 
 export { formatPathPerFloor, formatPathTaken, checkPathEquality, renameQuestionMarkFloors, returnInitialFloorValues, returnAllFloorValues }

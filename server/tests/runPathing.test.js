@@ -64,6 +64,13 @@ test("adds additional data to initial floor array values", () => {
             current_hp: 34, 
             current_gold: 71 
         },
+        {
+            orig_type: "QEV",
+            type: "Event",
+            floor: 11,
+            current_hp: 30,
+            current_gold: 127
+        }
     ]
     
     const expected = [{
@@ -102,6 +109,24 @@ test("adds additional data to initial floor array values", () => {
         "current_gold": 71,
         "campfire_action": "SMITH",
         "upgraded_card": "Storm of Steel"
+    },
+    {
+        "orig_type": "QEV",
+        "type": "Event",
+        "floor": 11,
+        "current_hp": 30,
+        "current_gold": 127,
+        "cards_removed": [
+            "Strike_G"
+        ],
+        "damage_healed": 0,
+        "gold_gain": 0,
+        "player_choice": "Card Removal",
+        "damage_taken": 0,
+        "max_hp_gain": 0,
+        "max_hp_loss": 0,
+        "event_name": "The Cleric",
+        "gold_loss": 50
     },]
 
     expect(returnAllFloorValues(initial, sampleRun)).toEqual(expected)
