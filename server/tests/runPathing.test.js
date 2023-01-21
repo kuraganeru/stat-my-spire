@@ -42,7 +42,22 @@ test("returns an array of formatted floor objects", () => {
 })
 
 test("adds additional data to initial floor array values", () => {
-    const initial = [{ orig_type: 'M', type: 'Monster', floor: 1, current_hp: 63, current_gold: 117 }]
+    const initial = [
+        { 
+            orig_type: 'M', 
+            type: 'Monster', 
+            floor: 1, 
+            current_hp: 63, 
+            current_gold: 117 
+        },
+        { 
+            orig_type: 'R', 
+            type: 'Rest Site', 
+            floor: 8, 
+            current_hp: 34, 
+            current_gold: 71 
+        },
+    ]
     
     const expected = [{
         "orig_type": "M",
@@ -60,7 +75,16 @@ test("adds additional data to initial floor array values", () => {
         ],
         "potion_found": "FairyPotion",
         "relics_found": null
-    }]
+    },
+    {
+        "orig_type": "R",
+        "type": "Rest Site",
+        "floor": 8,
+        "current_hp": 34,
+        "current_gold": 71,
+        "campfire_action": "SMITH",
+        "upgraded_card": "Storm of Steel"
+    },]
 
     expect(returnAllFloorValues(initial, sampleRun)).toEqual(expected)
 })
