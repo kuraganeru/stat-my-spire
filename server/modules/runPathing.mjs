@@ -147,20 +147,24 @@ const formatShopFloors = (floorData, rawRunData) => {
     const itemsPurchasedOnFloor = formatShopPurchases.filter(shopPurchase => shopPurchase.floor === floorData.floor)
 
     // Finding purchased card removals
-    const formatShopRemovals = items_purged_floors.map((shopFloor, index) => {
+    const foundShopRemovals = formatShopRemovals(items_purged_floors, items_purged, floorData)
+
+    return {
+        ...floorData,
+        purchases: itemsPurchasedOnFloor.map(shop => shop.purchase),
+        card_removal_choice: foundShopRemovals ? foundShopRemovals.card_removal : null
+    }
+}
+
+const formatShopRemovals = (purged_floors, items_purged, floorData) => {
+    const formatShopRemovals = purged_floors.map((shopFloor, index) => {
         return {
             floor: shopFloor,
             card_removal: items_purged[index]
         }
     })
 
-    const cardRemovalFoundOnFloor = formatShopRemovals.find(purchasedRemoval => purchasedRemoval.floor === floorData.floor)
-
-    return {
-        ...floorData,
-        purchases: itemsPurchasedOnFloor.map(shop => shop.purchase),
-        card_removal_choice: cardRemovalFoundOnFloor ? cardRemovalFoundOnFloor.card_removal : null
-    }
+    return formatShopRemovals.find(purchasedRemoval => purchasedRemoval.floor === floorData.floor)
 }
 
 export { formatPathPerFloor, formatPathTaken, checkPathEquality, formatQuestionMarkFloors, returnInitialFloorValues, returnAllFloorValues }
