@@ -1,4 +1,4 @@
-import { formatPathPerFloor, formatPathTaken, checkPathEquality, formatQuestionMarkFloors, returnInitialFloorValues, returnAllFloorValues } from "../modules/runPathing.mjs";
+import { formatPathPerFloor, formatPathTaken, checkPathEquality, renameQuestionMarkFloors, returnInitialFloorValues, returnAllFloorValues } from "../modules/runPathing.mjs";
 import { sampleRun } from "../game_data/sampleRun.js";
 
 test("Replaces null value with 'AB' or returns original value", () => {
@@ -24,11 +24,11 @@ test("checks equality between formatted path_taken and path_per_floor arrays", (
     expect(checkPathEquality(pathTaken, pathFloor)).toBe(true)
 })
 
-test("returns an array with formatted question mark floors", () => {
+test("returns an array with renamed question mark floors", () => {
     const pathTaken = ['M', '?', '?', '?', '?']
     const pathFloor = ['M', 'M', '?', 'T', '$']
     const expected = ['M', 'QM', 'QEV', 'QT', 'Q$']
-    expect(formatQuestionMarkFloors(pathTaken, pathFloor)).toEqual(expected)
+    expect(renameQuestionMarkFloors(pathTaken, pathFloor)).toEqual(expected)
 })
 
 test("returns an array of formatted floor objects", () => {

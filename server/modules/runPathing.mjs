@@ -54,7 +54,7 @@ const checkPathEquality = (pathTaken, pathPerFloor) => {
     if pathTaken[i] is not a ?, ignore the value entirely.
     if pathTaken[i] IS a ?, reference pathFloor for the "real" value and replace with formatted value.
 */
-const formatQuestionMarkFloors = (pathTaken, pathFloor) => {
+const renameQuestionMarkFloors = (pathTaken, pathFloor) => {
     return pathTaken.map((floorTaken, index) => {
         if (floorTaken !== "?") {
             return floorTaken
@@ -73,7 +73,7 @@ const formatQuestionMarkFloors = (pathTaken, pathFloor) => {
 }
 
 const returnInitialFloorValues = (pathTaken, pathFloor, hpPerFloor, goldPerFloor) => {
-    const formattedBasePath = formatQuestionMarkFloors(pathTaken, pathFloor)
+    const formattedBasePath = renameQuestionMarkFloors(pathTaken, pathFloor)
 
     return formattedBasePath.map((floor, index) => {
         const foundFormattedFloor = floorTypes.find(formattedFloor => formattedFloor.orig_name === floor)
@@ -170,4 +170,4 @@ const formatShopPurchases = (item_purchase_floors, items_purchased, floorData) =
     return formatShopPurchases.filter(shopPurchase => shopPurchase.floor === floorData.floor)
 }
 
-export { formatPathPerFloor, formatPathTaken, checkPathEquality, formatQuestionMarkFloors, returnInitialFloorValues, returnAllFloorValues }
+export { formatPathPerFloor, formatPathTaken, checkPathEquality, renameQuestionMarkFloors, returnInitialFloorValues, returnAllFloorValues }
