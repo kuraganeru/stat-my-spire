@@ -79,18 +79,7 @@ app.get("/run", async (req, res) => { // currently hardcoded while scaffolding f
 })
 
 app.post("/upload", async (req, res) => {
-	const rawRunData = fs.readFileSync('uploads/silent.json')
-	const rawRunDataJSON = JSON.parse(rawRunData)
-	const formatRunHistory = runPathing(rawRunDataJSON)
-	const formatRunInfo = runInfo(rawRunDataJSON)
-	const formatRelicList = relicData(rawRunDataJSON)
-	const runNodes = {
-		...formatRunInfo,
-		run_nodes: formatRunHistory,
-		final_deck: formatDeck,
-		relics_obtained: formatRelicList
-	}
-	res.json(runNodes)
+	// const rawRunData = fs.readFileSync('uploads/silent.json')
 })
 
 app.post("/upload_files", upload.single("runData"), (req, res) => {
