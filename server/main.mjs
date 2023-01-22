@@ -204,8 +204,6 @@ const runInfo = (runData) => {
 		date.setSeconds(seconds)
 		return date.toISOString().substr(11, 8)
 	}
-
-	const neowBonusArr = [neow_bonus] // set to an array for formatting uses
 	
 	return {
 		ascension_level,
@@ -216,7 +214,7 @@ const runInfo = (runData) => {
 		score_breakdown,
 		seed: seed_played,
 		character: formatCharacterChosen(character_chosen),
-		neow_bonus: returnFormattedNeowBonus(neowBonusArr, neow_cost, card_choices, neow_bonuses_skipped_log, relic_stats)
+		neow_bonus: returnFormattedNeowBonus(neow_bonus, neow_cost, card_choices, neow_bonuses_skipped_log, relic_stats)
 	}
 }
 

@@ -29,7 +29,8 @@ const returnNeowCosts = cost => {
 }
 
 const returnFormattedNeowBonus = (bonus, cost, card_choices, skippedBonuses, relic_stats) => {
-	const chosenBonus = returnNeowBonusesArr(bonus)
+	const neowBonusArr = [bonus]
+	const chosenBonus = returnNeowBonusesArr(neowBonusArr)
 	const chosenCost = returnNeowCosts(cost)
 	return {
 		neow_bonus_chosen: {
