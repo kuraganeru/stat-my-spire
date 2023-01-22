@@ -231,4 +231,13 @@ const formatTreasureFloors = (floorData, rawRunData) => {
     }
 }
 
-export { formatPathPerFloor, formatPathTaken, checkPathEquality, renameQuestionMarkFloors, returnInitialFloorValues, returnAllFloorValues }
+const returnFormattedRunHistory = (rawRunData) => {
+    const { path_per_floor, path_taken, current_hp_per_floor, gold_per_floor } = rawRunData;
+    const formattedPathFloor = formatPathPerFloor(path_per_floor);
+    const formattedPathTaken = formatPathTaken(path_taken);
+    const initialFloorValues = returnInitialFloorValues(formattedPathTaken, formattedPathFloor, current_hp_per_floor, gold_per_floor);
+
+    return returnAllFloorValues(initialFloorValues, rawRunData)
+}
+
+export { formatPathPerFloor, formatPathTaken, checkPathEquality, renameQuestionMarkFloors, returnInitialFloorValues, returnAllFloorValues, returnFormattedRunHistory }
