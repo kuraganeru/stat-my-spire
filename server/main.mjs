@@ -10,6 +10,7 @@ import { charactersList } from './game_data/characters.mjs'
 import {returnFormattedDeck} from "./modules/formatDeck.mjs"
 import { returnFormattedNeowBonus } from './modules/neowBonuses.mjs'
 import { relicData } from './modules/relics.mjs'
+import { returnFormattedRunHistory } from './modules/runPathing.mjs'
 
 // express
 const app = express()
@@ -27,170 +28,6 @@ var storage = multer.diskStorage({
 	}
 })
 const upload = multer({ storage: storage })
-
-// floors / pathing
-const runPathing = (data) => {
-	const { path_per_floor, path_taken, current_hp_per_floor, gold_per_floor } = data
-
-	const formattedPathPerFloor = path_per_floor.map(val => {
-		if (val === null) {
-			return "AB"
-		}
-		if (val === "B") {
-			return "BOSS"
-		}
-		return val
-	})
-
-	const formatPathTakenFn = (arr) => {
-		let path = [...arr]
-		for (let i = path.length - 1; i >= 0; i--) {
-			if (path[i] === "BOSS" && path[i + 1] != "BOSS") {
-				path.splice(i + 1, 0, "AB")
-			}
-		}
-		return path;
-	}
-	const formattedPathTaken = formatPathTakenFn(path_taken)
-
-	const checkPathFloorTakenAreEqual = (formattedPathPerFloor.length === formattedPathTaken.length) && formattedPathPerFloor.every(val => formattedPathTaken.includes(val)) // use to error check
-
-	const floorData = formattedPathTaken.map((val, index) => {
-		const floorTypes = [
-			{ orig_name: "M", new_name: "Monster" },
-			{ orig_name: "?", new_name: "Question Mark" },
-			{ orig_name: "$", new_name: "Shop" },
-			{ orig_name: "E", new_name: "Elite" },
-			{ orig_name: "BOSS", new_name: "Boss" },
-			{ orig_name: "R", new_name: "Rest Site" },
-			{ orig_name: "T", new_name: "Treasure" },
-			{ orig_name: "AB", new_name: "After Boss" },
-			{ orig_name: "QEV", new_name: "Event" },
-			{ orig_name: "QM", new_name: "Unknown / Monster" },
-			{ orig_name: "Q$", new_name: "Unknown / Shop" },
-			{ orig_name: "QT", new_name: "Unknown / Treasure" }]
-
-		// compare path_taken vs floor
-		const compareTakenFloorPaths = (taken, floor) => {
-			if (taken !== "?") {
-				return val
-			}
-
-			if (floor === "?") {
-				return "QEV"
-			}
-
-			if (floor === "M") {
-				return "QM"
-			}
-
-			if (floor === "$") {
-				return "Q$"
-			}
-
-			if (floor === "T") {
-				return "QT"
-			}
-		}
-		const comparePathsResult = compareTakenFloorPaths(val, formattedPathPerFloor[index])
-		const formattedType = floorTypes.find(obj => obj.orig_name === comparePathsResult)
-
-		return {
-			orig_type: formattedType.orig_name,
-			type: formattedType.new_name,
-			floor: index + 1,
-			current_hp: current_hp_per_floor[index],
-			current_gold: gold_per_floor[index]
-		}
-	})
-
-	const returnNodes = () => {
-		return floorData.map(val => {
-			switch (val.orig_type) {
-				case "M":
-				case "QM":
-				case "E":
-				case "BOSS":
-					const {damage_taken, card_choices, potions_obtained} = data
-					const fightData = damage_taken.find(m => m.floor === val.floor)
-					const cardData = card_choices.find(c => c.floor === val.floor)
-					const potionData = potions_obtained.find(p => p.floor === val.floor)
-					// add relic data for elites
-					const relicData = data.relics_obtained.find(r => r.floor === val.floor)
-					return {
-						...val,
-						enemies: fightData.enemies,
-						damage: fightData.damage,
-						turns: fightData.turns,
-						card_picked: cardData ? cardData.picked : null,
-						card_not_picked: cardData ? cardData.not_picked : null,
-						potion_found: potionData ? potionData.key : null,
-						relic_found: relicData ? relicData.key : null
-					}
-				case "R":
-					const {campfire_choices} = data
-					const restData = campfire_choices.find(camp => camp.floor === val.floor)
-					return {
-						...val,
-						action: restData.key,
-						upgraded_card: restData.key === "SMITH" ? restData.data : null
-					}
-				case "$":
-				case "Q$":
-					const {item_purchase_floors, items_purchased, items_purged_floors, items_purged} = data
-					const shopPurchases = item_purchase_floors.map((shopFloor, index) => ({ floor: shopFloor, purchase: items_purchased[index] }))
-					const purchasesPerFloor = shopPurchases.filter(sp => sp.floor === val.floor)
-
-					// combine removal + floor, and find the removal
-					const shopRemovals = items_purged_floors.map((shopFloor, index) => ({ floor: shopFloor, removal: items_purged[index] }))
-					const removal = shopRemovals.find(rm => rm.floor === val.floor)
-
-					return {
-						...val,
-						purchases: purchasesPerFloor.map(item => item.purchase),
-						card_removal_choice: removal ? removal.removal : null
-					}
-				case "T":
-				case "QT":
-					const { blue_key_relic_skipped_log: blue_key_log } = data;
-					const treasureData = data.relics_obtained.find(treasureFloor => treasureFloor.floor === val.floor)
-					return {
-						...val,
-						skipped_relic: !Boolean(treasureData),
-						found_relic: treasureData ? treasureData.key : `Skipped ${blue_key_log ? blue_key_log.relicID : "unavailable"} for Blue Key (Skipped relic not available for old runs)`
-					}
-				case "QEV":
-					const {event_choices} = data
-					const eventData = event_choices.find(eventFloor => eventFloor.floor === val.floor)
-					return {
-						...val,
-						...eventData
-					}
-				case "AB":
-					const {boss_relics} = data
-					const obtainStats = data.relic_stats.obtain_stats[0]
-					const reduceObtainStatsToArr = Object.entries(obtainStats).reduce((total, current) => {
-						return [
-							...total,
-							{
-								relic_name: current[0],
-								floor_obtained: current[1]
-							}
-						]
-					}, [])
-					const foundBossRelics = reduceObtainStatsToArr.find(b => b.floor_obtained === val.floor)
-					const skippedRelics = foundBossRelics && boss_relics.find(g => g.picked === foundBossRelics.relic_name)
-					return {
-						...val, 
-						boss_picked_relic: foundBossRelics ? foundBossRelics.relic_name : null,
-						boss_skipped_relic: skippedRelics ? skippedRelics.not_picked : null 
-					}
-			}
-		})
-	}
-
-	return returnNodes()
-}
 
 const formatCharacterChosen = char => {
 	return charactersList.find(character => character.original_name === char).formatted_name
@@ -221,9 +58,10 @@ const runInfo = (runData) => {
 const formatRunData = rawRunData => {
 	const rawRunDataJSON = JSON.parse(rawRunData)
 	const formatDeck = returnFormattedDeck(rawRunDataJSON.master_deck)
-	const formatRunHistory = runPathing(rawRunDataJSON)
+	const formatRunHistory = returnFormattedRunHistory(rawRunDataJSON)
 	const formatRunInfo = runInfo(rawRunDataJSON)
 	const formatRelicList = relicData(rawRunDataJSON)
+
 	return {
 		...formatRunInfo,
 		run_nodes: formatRunHistory,
