@@ -79,11 +79,39 @@ test("adds additional data to initial floor array values", () => {
             current_gold: 195
         },
         {
+            orig_type: "T",
+            type: "Treasure",
+            floor: 26,
+            current_hp: 44,
+            current_gold: 212,
+        },
+        {
+            orig_type: "BOSS",
+            type: "Boss",
+            floor: 33,
+            current_hp: 45,
+            current_gold: 440,
+        },
+        {
             orig_type: "QM",
             type: "Unknown / Monster",
             floor: 36,
             current_hp: 70,
             current_gold: 541
+        },
+        {
+            orig_type: "E",
+            type: "Elite",
+            floor: 42,
+            current_hp: 70,
+            current_gold: 168
+        },
+        {
+            orig_type: "T",
+            type: "Treasure",
+            floor: 43,
+            current_hp: 70,
+            current_gold: 195,
         }
     ]
     
@@ -155,6 +183,32 @@ test("adds additional data to initial floor array values", () => {
         ]
     },
     {
+        "orig_type": "T",
+        "type": "Treasure",
+        "floor": 26,
+        "current_hp": 44,
+        "current_gold": 212,
+        "skipped_relic": false,
+        "found_relic": "CeramicFish"
+    },
+    {
+        "orig_type": "BOSS",
+        "type": "Boss",
+        "floor": 33,
+        "current_hp": 45,
+        "current_gold": 440,
+        "enemies": "Automaton",
+        "damage_taken": 7,
+        "turns_taken": 6,
+        "card_picked": "Malaise+1",
+        "card_not_picked": [
+            "Glass Knife",
+            "Doppelganger+1"
+        ],
+        "potion_found": null,
+        "relics_found": null
+    },
+    {
         "orig_type": "QM",
         "type": "Unknown / Monster",
         "floor": 36,
@@ -170,6 +224,32 @@ test("adds additional data to initial floor array values", () => {
         ],
         "potion_found": null,
         "relics_found": null
+    },
+    {
+        "orig_type": "E",
+        "type": "Elite",
+        "floor": 42,
+        "current_hp": 70,
+        "current_gold": 168,
+        "enemies": "Nemesis",
+        "damage_taken": 0,
+        "turns_taken": 3,
+        "card_picked": "Reflex+1",
+        "card_not_picked": [
+            "Poisoned Stab+1",
+            "Tactician+1"
+        ],
+        "potion_found": null,
+        "relics_found": "Frozen Egg 2"
+    },
+    {
+        "orig_type": "T",
+        "type": "Treasure",
+        "floor": 43,
+        "current_hp": 70,
+        "current_gold": 195,
+        "skipped_relic": true,
+        "found_relic": "Skipped Oddly Smooth Stone for Blue Key (Skipped relic not available for old runs)"
     },]
 
     expect(returnAllFloorValues(initial, sampleRun)).toEqual(expected)
