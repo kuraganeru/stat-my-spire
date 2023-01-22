@@ -104,6 +104,9 @@ const returnAllFloorValues = (initialFloors, rawRunData) => {
                 return formatEventFloors(floor, rawRunData);
             case "AB":
                 return formatAfterBossFloors(floor, rawRunData);
+            case "T":
+            case "QT":
+                return formatTreasureFloors(floor, rawRunData);
         }
     })
 }
@@ -213,6 +216,18 @@ const formatBossRelics = (boss_relics, relic_stats, floorData) => {
     return {
         foundBossRelics,
         skippedBossRelics
+    }
+}
+
+const formatTreasureFloors = (floorData, rawRunData) => {
+    const { blue_key_relic_skipped_log: blue_key_log, relics_obtained } = rawRunData
+    const foundTreasure = relics_obtained.find(treasure => treasure.floor === floorData.floor)
+    const skippedTreasureStr = `Skipped ${blue_key_log ? blue_key_log.relicID : "unavailable"} for Blue Key (Skipped relic not available for old runs)`
+
+    return {
+        ...floorData,
+        skipped_relic: !foundTreasure,
+        found_relic: foundTreasure ? foundTreasure.key : skippedTreasureStr
     }
 }
 
