@@ -46,7 +46,7 @@ const SubmitForm = (props) => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <input type="file" name="files" id="files" accept=".run" onChange={handleSetRawRun}/>
+            <input type="file" name="files" id="files" accept=".run" onChange={handleSetRawRun} />
             <button type="submit">Submit</button>
         </form>
     )
