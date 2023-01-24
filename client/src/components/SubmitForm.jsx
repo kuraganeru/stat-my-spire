@@ -32,14 +32,15 @@ const SubmitForm = (props) => {
 
     const handleSubmit = async ev => {
         ev.preventDefault();
-        try {
-            const createdFormData = createFormData(props.rawRun)
-            const uploadResponse = await uploadFormData(createdFormData)
+        const createdFormData = createFormData(props.rawRun)
+        const uploadResponse = await uploadFormData(createdFormData).catch(err => {
+            console.log(err)
+        })
+        if (uploadResponse) {
             props.setFormattedRun(uploadResponse)
-        } catch (error) {
-            throw new Error(error)
-        } finally {
-            console.log("Upload complete")
+        } else {
+            alert("There was an error uploading the run.")
+            props.setFormattedRun(null)
         }
     }
 
