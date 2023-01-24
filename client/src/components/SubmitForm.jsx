@@ -19,7 +19,13 @@ const SubmitForm = (props) => {
             body: formData
         }
 
-        const response = await fetch(uploadUrl, uploadParams)
+        const response = await fetch(uploadUrl, uploadParams).catch((err) => {
+            if (!err.response) {
+                throw new Error("Server is offline")
+            } else {
+                throw new Error(err)
+            }
+        })
         const responseJSON = await response.json()
         return responseJSON
     }
