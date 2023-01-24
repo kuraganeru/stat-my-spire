@@ -14,7 +14,7 @@ function App() {
   */
   useEffect(() => {
     // component updated? do this
-    if (Object.keys(formattedRun).length > 0) {
+    if (formattedRun && Object.keys(formattedRun).length > 0) {
       console.log(formattedRun)
     }
   }, [formattedRun])
@@ -23,7 +23,7 @@ function App() {
     <div className="App">
       <h1>Stat My Spire</h1>
       <SubmitForm setFormattedRun={setFormattedRun} setRawRun={setRawRun} rawRun={rawRun} />
-      <h2>{formattedRun.character}</h2>
+      <h2>{formattedRun && formattedRun.character}</h2>
     </div>
   )
 }
