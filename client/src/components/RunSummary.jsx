@@ -1,9 +1,11 @@
 import React from 'react'
 
+import RunHeader from './RunHeader'
+
 const RunSummary = props => {
     return (
         <div>
-            <h2>{props.formattedRun ? props.formattedRun.character : null}</h2>
+            <RunHeader formattedRun={props.formattedRun} />
         </div>
     )
 }
