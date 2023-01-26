@@ -3,10 +3,11 @@ const config = {
         "^.+\\.[t|j]sx?$": "babel-jest"
     },
     automock: false,
-    setupFiles: [
+    setupFilesAfterEnv: [
         "./src/tests/setupJest.js"
     ],
-    extensionsToTreatAsEsm: [".jsx"]
+    extensionsToTreatAsEsm: [".jsx"],
+    testEnvironment: "jsdom"
 }
 
 export default config;
