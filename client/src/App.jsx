@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 
 // Components
 import SubmitForm from './components/SubmitForm'
+import RunSummary from './components/RunSummary'
 
 function App() {
   const [rawRun, setRawRun] = useState('')
@@ -23,7 +24,7 @@ function App() {
     <div className="App">
       <h1>Stat My Spire</h1>
       <SubmitForm setFormattedRun={setFormattedRun} setRawRun={setRawRun} rawRun={rawRun} />
-      <h2>{formattedRun && formattedRun.character}</h2>
+      <RunSummary formattedRun={formattedRun} />
     </div>
   )
 }
