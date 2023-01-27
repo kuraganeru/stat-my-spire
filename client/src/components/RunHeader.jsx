@@ -10,6 +10,7 @@ const RunHeader = props => {
             <>
                 <h2>{formattedRun.character}</h2>
                 <h3>Ascension Level {formattedRun.ascension_level}</h3>
+                <h3>{formattedRun.victory ? "Victory!" : "Defeat..."}</h3>
             </>
         )
     }
