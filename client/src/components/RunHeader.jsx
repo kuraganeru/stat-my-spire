@@ -3,7 +3,7 @@ import React, { Fragment } from 'react'
 const RunHeader = props => {
 
     const renderFormattedRun = (formattedRun) => {
-        if (!props.formattedRun) {
+        if (!formattedRun || Object.keys(formattedRun).length <= 0) {
             return null
         }
         return (
