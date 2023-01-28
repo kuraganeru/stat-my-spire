@@ -16,9 +16,9 @@ const RunHeader = props => {
     }
 
     return (
-        <div>
+        <>
             {renderFormattedRun(props.formattedRun)}
-        </div>
+        </>
     )
 }
 
