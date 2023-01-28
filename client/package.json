@@ -12,6 +12,7 @@
   "dependencies": {
     "jest-fetch-mock": "^3.0.3",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.7.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
