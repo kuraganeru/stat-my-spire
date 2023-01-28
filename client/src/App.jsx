@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
-import { useEffect } from 'react'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Components
 import SubmitForm from './components/SubmitForm'
