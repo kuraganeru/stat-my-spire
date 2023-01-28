@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 // Components
 import SubmitForm from './components/SubmitForm'
 import RunSummary from './components/RunSummary'
+import AppNavigation from "./components/AppNavigation"
 
 function App() {
   const [rawRun, setRawRun] = useState('')
@@ -22,7 +23,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Stat My Spire</h1>
+      <AppNavigation />
       <SubmitForm setFormattedRun={setFormattedRun} setRawRun={setRawRun} rawRun={rawRun} />
       <RunSummary formattedRun={formattedRun} />
     </div>
