@@ -11,7 +11,7 @@ const RunHeader = props => {
         }
     }
 
-    const renderFormattedRun = (formattedRun) => {
+    const renderRunHeader = (formattedRun) => {
         if (!formattedRun || Object.keys(formattedRun).length <= 0) {
             return null
         }
@@ -26,7 +26,7 @@ const RunHeader = props => {
 
     return (
         <>
-            {renderFormattedRun(props.formattedRun)}
+            {renderRunHeader(props.formattedRun)}
         </>
     )
 }
