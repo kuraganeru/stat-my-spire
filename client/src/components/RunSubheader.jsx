@@ -13,7 +13,7 @@ const RunSubheader = props => {
                 <RunNeowBonuses />
             </Col>
             <Col>
-                <RunRelics />
+                <RunRelics formattedRun={props.formattedRun} />
             </Col>
         </Row>
     )
